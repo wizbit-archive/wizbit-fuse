@@ -51,7 +51,7 @@ class WizbitFs(fuse.Fuse):
         pass
 
 if __name__ == "__main__":
-    server = WizbitFs(version="%prog 1",  usage="./wizbitfs", dash_s_do='setsingle')
+    server = WizbitFs(version="%prog 1",  usage="./wizbitfs mount_dir", dash_s_do='setsingle')
     server.threaded = False
     server.parse(errex=1)
     server.main()
