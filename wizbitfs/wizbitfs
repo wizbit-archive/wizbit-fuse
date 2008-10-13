@@ -2,7 +2,7 @@
 
 import fuse
 import wizbit
-import stat, errno
+import os, stat, errno
 
 fuse.fuse_python_api = (0, 2)
 
@@ -24,7 +24,7 @@ class WizbitFs(fuse.Fuse):
 
     def __init__(self, *args, **kwargs):
         super(WizbitFs, self).__init__(*args, **kwargs)
-        self.store = wizbit.Store()
+        self.store = wizbit.Store("uuid", os.path.join(os.path.expanduser('~'), ".wizbit"))
 
     def getattr(self, path):
         st = WizbitStat()
