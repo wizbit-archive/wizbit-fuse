@@ -81,6 +81,12 @@ class WizbitFs(fuse.Fuse):
         for x in ent.children.keys():
             yield fuse.Direntry(x)
 
+    def rmdir(self, path):
+        pass
+
+    def mkdir(self, path, mode):
+        print path
+
     def read(self, path, size, offset):
         bit = wizbit.Bit(self.store, path)
         version = wizbit.Version(bit, bit.primary_tip)
