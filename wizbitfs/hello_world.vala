@@ -48,7 +48,7 @@ static int hello_open(string path, FileInfo fi)
 }
 
 
-static int hello_read(string path, char *buf, size_t size, int offset, FileInfo fi)
+static int hello_read(string path, char *buf, size_t size, long offset, FileInfo fi)
 {
 	if (path != hello_path)
 		return -ENOENT;
