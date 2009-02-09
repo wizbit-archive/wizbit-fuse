@@ -24,7 +24,7 @@ static int hello_getattr(string path, stat *stbuf)
 	return res;
 }
 
-static int hello_readdir(string path, void *buf, FillDir filler, int offset, FileInfo fi)
+static int hello_readdir(string path, void *buf, FillDir filler, off_t offset, FileInfo fi)
 {
 	if (path != "/")
 		return -ENOENT;
@@ -48,7 +48,7 @@ static int hello_open(string path, FileInfo fi)
 }
 
 
-static int hello_read(string path, char *buf, size_t size, long offset, FileInfo fi)
+static int hello_read(string path, char *buf, size_t size, off_t offset, FileInfo fi)
 {
 	if (path != hello_path)
 		return -ENOENT;
