@@ -18,7 +18,7 @@ wizbit-fuse.vala.stamp: $(wizbit_fuse_VALASOURCES)
 	$(VALAC) -C --basedir $(top_srcdir) $^
 	touch $@
 
-wizbit_fuse_CFLAGS=@WIZBIT_CFLAGS@ -I$(top_srcdir) -D_FILE_OFFSET_BITS=64
+wizbit_fuse_CFLAGS=@WIZBIT_CFLAGS@ -I$(top_srcdir) -D_FILE_OFFSET_BITS=64 -DFUSE_USE_VERSION=26
 wizbit_fuse_LDADD=@WIZBIT_LIBS@
 
 EXTRA_DIST = \

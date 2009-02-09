@@ -511,5 +511,28 @@ namespace Posix {
 	public ssize_t read (int fd, void* buf, size_t count);
 	[CCode (cheader_filename = "unistd.h")]
 	public ssize_t write (int fd, void* buf, size_t count);
+
+	[CCode (cheader_filename="sys/stat.h")]
+	public uint32 S_IFDIR;
+
+	[CCode (cheader_filename="sys/stat.h")]
+	public uint32 S_IFREG;
+
+	[CCode (cheader_filename = "sys/stat.h", cname="struct stat")]
+	public struct stat {
+		// public dev_t st_dev;
+		public long st_ino;
+		public uint32 st_mode;
+		public ulong st_nlink;
+		public uint32 st_uid;
+		public uint32 st_gid;
+		// public dev_t st_rdev;
+		public long st_size;
+		// public time_t st_atime;
+		// public time_t st_mtime;
+		// public time_t st_ctime;
+		// public blksize_t st_blksize;
+		// public blkcnt_t st_blocks;
+	}
 }
 

@@ -4,43 +4,37 @@ using Fuse;
 static const string hello_str = "Hello World!\n";
 static const string hello_path = "/hello";
 
-/*
-static int hello_getattr(const char *path, struct stat *stbuf)
+static int hello_getattr(string path, stat *stbuf)
 {
-    int res = 0;
+	int res = 0;
 
-    memset(stbuf, 0, sizeof(struct stat));
-    if(strcmp(path, "/") == 0) {
-        stbuf->st_mode = S_IFDIR | 0755;
-        stbuf->st_nlink = 2;
-    }
-    else if(strcmp(path, hello_path) == 0) {
-        stbuf->st_mode = S_IFREG | 0444;
-        stbuf->st_nlink = 1;
-        stbuf->st_size = strlen(hello_str);
-    }
-    else
-        res = -ENOENT;
+	Memory.set((void *)stbuf, 0, sizeof(stat));
 
-    return res;
+	if (path == "/") {
+		stbuf->st_mode = S_IFDIR | 0755;
+		stbuf->st_nlink = 2;
+	} else if (path == hello_path) {
+		stbuf->st_mode = S_IFREG | 0444;
+		stbuf->st_nlink = 1;
+		stbuf->st_size = hello_str.len();
+	} else {
+		res = -ENOENT;
+	}
+
+	return res;
 }
 
-static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
-                         off_t offset, struct fuse_file_info *fi)
+static int hello_readdir(string path, void *buf, FillDir filler, int offset, FileInfo fi)
 {
-    (void) offset;
-    (void) fi;
+	if (path != "/")
+		return -ENOENT;
 
-    if(strcmp(path, "/") != 0)
-        return -ENOENT;
+	filler(buf, ".", null, 0);
+	filler(buf, "..", null, 0);
+	filler(buf, "hello", null, 0);
 
-    filler(buf, ".", NULL, 0);
-    filler(buf, "..", NULL, 0);
-    filler(buf, hello_path + 1, NULL, 0);
-
-    return 0;
+	return 0;
 }
-*/
 
 static int hello_open(string path, FileInfo fi)
 {
@@ -72,8 +66,11 @@ static int hello_read(string path, char *buf, size_t size, int offset, FileInfo 
 static int main(string [] args)
 {
 	var opers = Operations();
+	opers.readdir = hello_readdir;
+	opers.getattr = hello_getattr;
 	opers.open = hello_open;
 	opers.read = hello_read;
-	return Fuse.main(ref args, opers);
+
+	return Fuse.main(ref args, opers, null);
 }
 

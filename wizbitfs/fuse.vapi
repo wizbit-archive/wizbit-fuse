@@ -1,4 +1,5 @@
 using GLib;
+using Posix;
 
 [CCode (cprefix="fuse_", cheader_filename="fuse/fuse.h")]
 namespace Fuse {
@@ -15,9 +16,10 @@ namespace Fuse {
 		public uint64 lock_owner;
 	}
 
-	public static delegate int FillDir(void *buf, string name, Stat stat, int offset);
+	[CCode (cname="fuse_fill_dir_t")]
+	public static delegate int FillDir(void *buf, string name, stat? st, int offset);
 
-	public static delegate int GetAttr(string path, Stat stbuf);
+	public static delegate int GetAttr(string path, stat *st);
 	public static delegate int ReadDir(string path, void *buf, FillDir filler, int offset, FileInfo fi);
 	public static delegate int Open(string path, FileInfo fi);
 	public static delegate int Read(string path, char *buf, size_t size, int offset, FileInfo fi);
@@ -30,6 +32,6 @@ namespace Fuse {
 		public Read read;
 	}
 
-	public int main([CCode (array_length_pos = 0.9)] ref weak string[] args, Operations oper);
+	public int main([CCode (array_length_pos = 0.9)] ref weak string[] args, Operations oper, void *user_data);
 }
 
