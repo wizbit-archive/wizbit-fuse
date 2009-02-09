@@ -6,7 +6,7 @@ BUILT_SOURCES = wizbit-fuse.vala.stamp
 wizbit_fuse_VALASOURCES = \
 	posix.vapi \
 	fuse.vapi \
-	hello_world.vala \
+	wizbit-fuse.vala \
 	$(NULL)
 
 wizbit_fuse_SOURCES = \
