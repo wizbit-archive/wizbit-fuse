@@ -4,7 +4,15 @@ using GLib;
 namespace Fuse {
 	[CCode (cname="struct fuse_file_info")]
 	public struct FileInfo {
-		/* */
+		public int flags;
+		public ulong fh_old;
+		public int writepage;
+		public uint direct_io;
+		public uint keep_cache;
+		public uint flush;
+		public uint padding;
+		public uint64 fh;
+		public uint64 lock_owner;
 	}
 
 	public static delegate int FillDir(void *buf, string name, Stat stat, int offset);

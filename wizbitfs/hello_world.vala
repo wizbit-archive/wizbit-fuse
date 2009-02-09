@@ -40,18 +40,19 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 
     return 0;
 }
-
-static int hello_open(const char *path, struct fuse_file_info *fi)
-{
-    if(strcmp(path, hello_path) != 0)
-        return -ENOENT;
-
-    if((fi->flags & 3) != O_RDONLY)
-        return -EACCES;
-
-    return 0;
-}
 */
+
+static int hello_open(string path, FileInfo fi)
+{
+	if (path != hello_path)
+		return -ENOENT;
+
+	if ((fi.flags & 3) != O_RDONLY)
+		return -EACCES;
+
+	return 0;
+}
+
 
 static int hello_read(string path, char *buf, size_t size, int offset, FileInfo fi)
 {
@@ -71,6 +72,7 @@ static int hello_read(string path, char *buf, size_t size, int offset, FileInfo 
 static int main(string [] args)
 {
 	var opers = Operations();
+	opers.open = hello_open;
 	opers.read = hello_read;
 	return Fuse.main(ref args, opers);
 }
