@@ -1,5 +1,5 @@
-using Posix;
 using Fuse;
+using Posix;
 
 static const string hello_str = "Hello World!\n";
 static const string hello_path = "/hello";
@@ -11,10 +11,10 @@ static int hello_getattr(string path, stat *stbuf)
 	Memory.set((void *)stbuf, 0, sizeof(stat));
 
 	if (path == "/") {
-		stbuf->st_mode = S_IFDIR | 0755;
+		stbuf->st_mode = (mode_t)S_IFDIR | 0755;
 		stbuf->st_nlink = 2;
 	} else if (path == hello_path) {
-		stbuf->st_mode = S_IFREG | 0444;
+		stbuf->st_mode = (mode_t)S_IFREG | 0444;
 		stbuf->st_nlink = 1;
 		stbuf->st_size = hello_str.len();
 	} else {
