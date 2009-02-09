@@ -71,6 +71,6 @@ static int main(string [] args)
 	opers.open = hello_open;
 	opers.read = hello_read;
 
-	return Fuse.main(ref args, opers, null);
+	return Fuse.main(args, opers, null);
 }
 

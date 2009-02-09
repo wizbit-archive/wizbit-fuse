@@ -32,6 +32,6 @@ namespace Fuse {
 		public Read read;
 	}
 
-	public int main([CCode (array_length_pos = 0.9)] ref weak string[] args, Operations oper, void *user_data);
+	public int main([CCode (array_length_pos = 0.9)] string[] args, Operations oper, void *user_data);
 }
 
