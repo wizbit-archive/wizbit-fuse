@@ -94,7 +94,7 @@ namespace Fuse {
 	public static delegate int Open(string path, FileInfo fi);
 	public static delegate int Read(string path, char *buf, size_t size, off_t offset, FileInfo fi);
 	public static delegate int Write(string path, char *buf, size_t size, off_t offset, FileInfo fi);
-	// public static delegate int StatFs(string path, statvfs *stbuf);
+	public static delegate int StatFs(string path, statvfs *stbuf);
 	public static delegate int Release(string path, FileInfo fi);
 	public static delegate int Fsync(string path, int isdatasync, FileInfo fi);
 
@@ -124,7 +124,7 @@ namespace Fuse {
 		public Open open;
 		public Read read;
 		public Write write;
-		// public StatFs statfs;
+		public StatFs statfs;
 		public Release release;
 		public Fsync fsync;
 		public SetXAttr setxattr;
