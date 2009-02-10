@@ -41,6 +41,9 @@ public class DirectoryEntryIterator {
 		pos++;
 
 		de.mode = (long)((string)this.buf);
+		while (pos < size && this.buf[pos] != '\0')
+			pos++;
+		pos++;
 
 		return de;
 	}
