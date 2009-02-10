@@ -105,12 +105,15 @@ static int hello_getattr(string path, stat *stbuf)
 
 static int hello_readdir(string path, void *buf, FillDir filler, off_t offset, Fuse.FileInfo fi)
 {
-	if (path != "/")
+	var dirent = DirectoryEntry.find(path);
+	if (dirent == null)
 		return -ENOENT;
 
 	filler(buf, ".", null, 0);
 	filler(buf, "..", null, 0);
-	filler(buf, "hello", null, 0);
+
+	foreach (var child in dirent)
+		filler(buf, child.path, null, 0);
 
 	return 0;
 }
