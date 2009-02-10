@@ -67,7 +67,7 @@ public class DirectoryEntry {
 		return null;
 	}
 
-	public void add_child(string path, DirectoryEntry de) {
+	public void add_child(DirectoryEntry de) {
 		var builder = new StringBuilder();
 		foreach (var thing in this)
 			builder.append(thing.as_string());
@@ -151,6 +151,10 @@ static int hello_readdir(string path, void *buf, FillDir filler, off_t offset, F
 
 static int hello_mkdir(string path, mode_t mode)
 {
+	var de = new DirectoryEntry();
+	de.path = Path.get_basename(path);
+	de.mode = mode;
+	DirectoryEntry.find_containing(path).add_child(de);
 	return 0;
 }
 
