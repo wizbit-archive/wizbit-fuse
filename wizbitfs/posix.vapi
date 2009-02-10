@@ -511,5 +511,154 @@ namespace Posix {
 	public ssize_t read (int fd, void* buf, size_t count);
 	[CCode (cheader_filename = "unistd.h")]
 	public ssize_t write (int fd, void* buf, size_t count);
+
+	[CCode (cheader_filename="time.h")]
+	public struct tm {
+		public int tm_sec;
+		public int tm_min;
+		public int tm_hour;
+		public int tm_mday;
+		public int tm_mon;
+		public int tm_year;
+		public int tm_wday;
+		public int tm_yday;
+		public int tm_isdt;
+	}
+
+	[CCode (cheader_filename="time.h")]
+	public struct timespec {
+		time_t tv_sec;
+		long tv_nsec;
+	}
+
+	[SimpleType]
+	[IntegerType (rank=9)]
+	[CCode (cheader_filename="sys/types.h", cname="off_t")]
+	public struct off_t {}
+
+	[SimpleType]
+	[IntegerType (rank=9)]
+	[CCode (cheader_filename="sys/types.h", cname="uid_t")]
+	public struct uid_t {}
+
+	[SimpleType]
+	[IntegerType (rank=9)]
+	[CCode (cheader_filename="sys/types.h", cname="gid_t")]
+	public struct gid_t {}
+
+	[SimpleType]
+	[IntegerType (rank=9)]
+	[CCode (cheader_filename="sys/types.h", cname="mode_t")]
+	public struct mode_t {}
+
+	[SimpleType]
+	[IntegerType (rank=9)]
+	[CCode (cheader_filename="sys/types.h", cname="dev_t")]
+	public struct dev_t {}
+
+	[SimpleType]
+	[IntegerType (rank=9)]
+	[CCode (cheader_filename="sys/types.h", cname="ino_t")]
+	public struct ino_t {}
+
+	[SimpleType]
+	[IntegerType (rank=9)]
+	[CCode (cheader_filename="sys/types.h", cname="nlink_t")]
+	public struct nlink_t {}
+
+	[SimpleType]
+	[IntegerType (rank=9)]
+	[CCode (cheader_filename="sys/types.h", cname="blksize_t")]
+	public struct blksize_t {}
+
+	[SimpleType]
+	[IntegerType (rank=9)]
+	[CCode (cheader_filename="sys/types.h", cname="blkcnt_t")]
+	public struct blkcnt_t {}
+
+	[SimpleType]
+	[IntegerType (rank=9)]
+	[CCode (cheader_filename="sys/statvfs.h", cname="fsblkcnt_t")]
+	public struct fsblkcnt_t {}
+
+	[SimpleType]
+	[IntegerType (rank=9)]
+	[CCode (cheader_filename="sys/statvfs.h", cname="fsfilcnt_t")]
+	public struct fsfilcnt_t {}
+
+	[CCode (cheader_filename="sys/stat.h", cname="S_IFMT")]
+	public const mode_t S_IFMT;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IFBLK")]
+	public const mode_t S_IFBLK;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IFCHR")]
+	public const mode_t S_IFCHR;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IFIFO")]
+	public const mode_t S_IFIFO;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IFREG")]
+	public const mode_t S_IFREG;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IFDIR")]
+	public const mode_t S_IFDIR;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IFLNK")]
+	public const mode_t S_IFLNK;
+
+	[CCode (cheader_filename="sys/stat.h", cname="S_IRWXU")]
+	public const mode_t S_IRWXU;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IRUSR")]
+	public const mode_t S_IRUSR;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IWUSR")]
+	public const mode_t S_IWUSR;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IXUSR")]
+	public const mode_t S_IXUSR;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IRWXG")]
+	public const mode_t S_IRWXG;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IRGRP")]
+	public const mode_t S_IRGRP;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IWGRP")]
+	public const mode_t S_IWGRP;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IXGRP")]
+	public const mode_t S_IXGRP;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IRWXO")]
+	public const mode_t S_IRWXO;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IROTH")]
+	public const mode_t S_IROTH;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IWOTH")]
+	public const mode_t S_IWOTH;
+	[CCode (cheader_filename="sys/stat.h", cname="S_IXOTH")]
+	public const mode_t S_IXOTH;
+	[CCode (cheader_filename="sys/stat.h", cname="S_ISUID")]
+	public const mode_t S_ISUID;
+	[CCode (cheader_filename="sys/stat.h", cname="S_ISGID")]
+	public const mode_t S_ISGID;
+	[CCode (cheader_filename="sys/stat.h", cname="S_ISVTX")]
+	public const mode_t S_ISVTX;
+
+	[CCode (cheader_filename="sys/stat.h", cname="struct stat")]
+	public struct stat {
+		public dev_t st_dev;
+		public ino_t st_ino;
+		public mode_t st_mode;
+		public nlink_t st_nlink;
+		public uid_t st_uid;
+		public gid_t st_gid;
+		public dev_t st_rdev;
+		public size_t st_size;
+		public time_t st_atime;
+		public time_t st_mtime;
+		public time_t st_ctime;
+		public blksize_t st_blksize;
+		public blkcnt_t st_blocks;
+	}
+
+	[CCode (cheader_filename="sys/statvfs.h", cname="struct statvfs")]
+	public struct statvfs {
+		public ulong f_bsize;
+		public ulong f_frsize;
+		public fsblkcnt_t f_blocks;
+		public fsblkcnt_t f_bfree;
+		public fsblkcnt_t f_bavail;
+		public fsfilcnt_t f_files;
+		public fsfilcnt_t f_ffree;
+		public fsfilcnt_t f_favail;
+	}
 }
 
