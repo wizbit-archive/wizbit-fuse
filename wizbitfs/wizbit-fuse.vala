@@ -13,10 +13,18 @@ public class DirectoryEntryIterator {
 	long size;
 	long pos;
 
-	public DirectoryEntryIterator(string uuid, string version) {
-		this.version = store.open_bit(uuid).open_version(version);
-		this.buf = this.version.read_as_string();
-		this.size = this.version.get_length();
+	public DirectoryEntryIterator(string uuid, string? version) {
+		if (store.has_bit(uuid)) {
+			if (version != null) {
+				this.version = store.open_bit(uuid).open_version(version);
+				this.buf = this.version.read_as_string();
+				this.size = this.version.get_length();
+			} else {
+				this.size = 0;
+			}
+		} else {
+			this.size = 0;
+		}
 		this.pos = 0;
 	}
 	public bool next() {
@@ -56,6 +64,13 @@ public class DirectoryEntry {
 	public string version;
 	public mode_t mode;
 
+	public DirectoryEntry() {
+		this.path = "";
+		this.uuid = "";
+		this.version = "";
+		this.mode = 0;
+	}
+
 	public DirectoryEntryIterator iterator() {
 		return new DirectoryEntryIterator(this.uuid, this.version);
 	}
@@ -72,6 +87,9 @@ public class DirectoryEntry {
 		foreach (var thing in this)
 			builder.append(thing.as_string());
 		builder.append(de.as_string());
+
+		var bit = store.open_bit(this.uuid);
+		bit.create_next_version_from_string(builder.str, bit.primary_tip);
 	}
 
 	public string as_string() {
@@ -89,6 +107,11 @@ public class DirectoryEntry {
 
 	public static DirectoryEntry root() {
 		var version = store.open_bit("ROOT").primary_tip;
+		if (version == null) {
+			var de = new DirectoryEntry();
+			de.uuid = "ROOT";
+			return de;
+		}
 		var iter = new DirectoryEntryIterator("ROOT", version.version_uuid);
 		return iter.get();
 	}
@@ -187,7 +210,10 @@ static int hello_read(string path, char *buf, size_t size, off_t offset, Fuse.Fi
 
 static int main(string [] args)
 {
-	store = new Wiz.Store("~/tmp/");
+	store = new Wiz.Store("", "~/tmp/");
+
+	if (!store.has_bit("ROOT"))
+		store.open_bit("ROOT").create_next_version_from_string("", null);
 
 	var opers = Operations();
 	opers.readdir = hello_readdir;
