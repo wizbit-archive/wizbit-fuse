@@ -17,6 +17,19 @@ namespace Fuse {
 		public uint64 lock_owner;
 	}
 
+	[CCode (cname="struct fuse")]
+	public struct Fuse {
+	}
+
+	[CCode (cname="struct fuse_context")]
+	public struct Context {
+		Fuse fuse;
+		uid_t uid;
+		gid_t gid;
+		/*pid_t pid;*/
+		void *private_data;
+	}
+
 	[CCode (cname="fuse_fill_dir_t")]
 	public static delegate int FillDir(void *buf, string name, stat? st, off_t offset);
 
@@ -46,7 +59,6 @@ namespace Fuse {
 	public static delegate int GetXAttr(string path, string name, char *value, size_t size);
 	public static delegate int ListXAttr(string path, char *list, size_t size);
 	public static delegate int RemoveXAttr(string path, string name);
-
 
 	[CCode (cname="struct fuse_operations")]
 	public struct Operations {
@@ -78,5 +90,5 @@ namespace Fuse {
 	}
 
 	public int main([CCode (array_length_pos = 0.9)] string[] args, Operations oper, void *user_data);
+	public Context get_context();
 }
-
