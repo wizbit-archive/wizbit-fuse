@@ -64,6 +64,26 @@ public class DirectoryEntry {
 		return null;
 	}
 
+	public void add_child(string path, DirectoryEntry de) {
+		var builder = new StringBuilder();
+		foreach (var thing in this)
+			builder.append(thing.as_string());
+		builder.append(de.as_string());
+	}
+
+	public string as_string() {
+		var builder = new StringBuilder();
+		builder.append(this.path);
+		builder.append_c('\0');
+		builder.append(this.uuid);
+		builder.append_c('\0');
+		builder.append(this.version);
+		builder.append_c('\0');
+		builder.append((string)this.mode);
+		builder.append_c('\0');
+		return builder.str;
+	}
+
 	public static DirectoryEntry root() {
 		var version = store.open_bit("ROOT").primary_tip;
 		var iter = new DirectoryEntryIterator("ROOT", version.version_uuid);
@@ -79,6 +99,14 @@ public class DirectoryEntry {
 				break;
 		}
 		return dirent;
+	}
+
+	public static DirectoryEntry find_containing(string path) {
+		var dirname = Path.get_dirname(path);
+		if (dirname == ".")
+			return DirectoryEntry.root();
+		else
+			return DirectoryEntry.find(dirname);
 	}
 }
 
