@@ -5,6 +5,8 @@ using Wiz;
 static const string hello_str = "Hello World!\n";
 static const string hello_path = "/hello";
 
+static Wiz.Store store;
+
 static int hello_getattr(string path, stat *stbuf)
 {
 	int res = 0;
@@ -66,7 +68,7 @@ static int hello_read(string path, char *buf, size_t size, off_t offset, Fuse.Fi
 
 static int main(string [] args)
 {
-	var store = new Wiz.Store("~/tmp/");
+	store = new Wiz.Store("~/tmp/");
 
 	var opers = Operations();
 	opers.readdir = hello_readdir;
