@@ -1,5 +1,6 @@
 using Fuse;
 using Posix;
+using Wiz;
 
 static const string hello_str = "Hello World!\n";
 static const string hello_path = "/hello";
@@ -24,7 +25,7 @@ static int hello_getattr(string path, stat *stbuf)
 	return res;
 }
 
-static int hello_readdir(string path, void *buf, FillDir filler, off_t offset, FileInfo fi)
+static int hello_readdir(string path, void *buf, FillDir filler, off_t offset, Fuse.FileInfo fi)
 {
 	if (path != "/")
 		return -ENOENT;
@@ -36,7 +37,7 @@ static int hello_readdir(string path, void *buf, FillDir filler, off_t offset, F
 	return 0;
 }
 
-static int hello_open(string path, FileInfo fi)
+static int hello_open(string path, Fuse.FileInfo fi)
 {
 	if (path != hello_path)
 		return -ENOENT;
@@ -48,7 +49,7 @@ static int hello_open(string path, FileInfo fi)
 }
 
 
-static int hello_read(string path, char *buf, size_t size, off_t offset, FileInfo fi)
+static int hello_read(string path, char *buf, size_t size, off_t offset, Fuse.FileInfo fi)
 {
 	if (path != hello_path)
 		return -ENOENT;
@@ -65,6 +66,8 @@ static int hello_read(string path, char *buf, size_t size, off_t offset, FileInf
 
 static int main(string [] args)
 {
+	var store = new Wiz.Store("~/tmp/");
+
 	var opers = Operations();
 	opers.readdir = hello_readdir;
 	opers.getattr = hello_getattr;
