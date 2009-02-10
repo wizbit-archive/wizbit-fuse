@@ -7,6 +7,82 @@ static const string hello_path = "/hello";
 
 static Wiz.Store store;
 
+public class DirectoryEntryIterator {
+	Wiz.Version version;
+	char *buf;
+	long size;
+	long pos;
+
+	public DirectoryEntryIterator(string uuid, string version) {
+		this.version = store.open_bit(uuid).open_version(version);
+		this.buf = this.version.read_as_string();
+		this.size = this.version.get_length();
+		this.pos = 0;
+	}
+	public bool next() {
+		return (pos < size);
+	}
+	public DirectoryEntry get() {
+		var de = new DirectoryEntry();
+
+		de.path = (string)this.buf;
+		while (pos < size && this.buf[pos] != '\0')
+			pos++;
+		pos++;
+
+		de.uuid = (string)this.buf;
+		while (pos < size && this.buf[pos] != '\0')
+			pos++;
+		pos++;
+
+		de.version = (string)this.buf;
+		while (pos < size && this.buf[pos] != '\0')
+			pos++;
+		pos++;
+
+		de.mode = (long)((string)this.buf);
+
+		return de;
+	}
+}
+
+[Compact]
+public class DirectoryEntry {
+	public string path;
+	public string uuid;
+	public string version;
+	public mode_t mode;
+
+	public DirectoryEntryIterator iterator() {
+		return new DirectoryEntryIterator(this.uuid, this.version);
+	}
+
+	public DirectoryEntry? find_child(string path_chunk) {
+		foreach (var d in this)
+			if (d.path == path_chunk)
+				return d;
+		return null;
+	}
+
+	public static DirectoryEntry root() {
+		var version = store.open_bit("ROOT").primary_tip;
+		var iter = new DirectoryEntryIterator("ROOT", version.version_uuid);
+		return iter.get();
+	}
+
+	public static DirectoryEntry find(string path) {
+		var chunks = path.substring(1).split("/");
+		var dirent = DirectoryEntry.root();
+		foreach (var chunk in chunks) {
+			dirent = dirent.find_child(chunk);
+			if (dirent != null)
+				break;
+		}
+		return dirent;
+	}
+}
+
+
 static int hello_getattr(string path, stat *stbuf)
 {
 	int res = 0;
