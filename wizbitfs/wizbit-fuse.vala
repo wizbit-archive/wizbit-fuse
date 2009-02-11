@@ -15,7 +15,7 @@ public class DirectoryEntryIterator {
 
 	public DirectoryEntryIterator(string uuid, string? version) {
 		if (store.has_bit(uuid)) {
-			if (version != null) {
+			if (version != null && version != "") {
 				this.version = store.open_bit(uuid).open_version(version);
 				this.buf = this.version.read_as_string();
 				this.size = this.version.get_length();
@@ -100,7 +100,7 @@ public class DirectoryEntry {
 		builder.append_c('\0');
 		builder.append(this.version);
 		builder.append_c('\0');
-		builder.append((string)this.mode);
+		builder.append(((long)this.mode).to_string());
 		builder.append_c('\0');
 		return builder.str;
 	}
@@ -139,22 +139,28 @@ public class DirectoryEntry {
 
 static int hello_getattr(string path, stat *stbuf)
 {
-	int res = 0;
-
 	Memory.set((void *)stbuf, 0, sizeof(stat));
 
 	if (path == "/") {
-		stbuf->st_mode = S_IFDIR | 0755;
+		stbuf->st_mode = S_IFDIR | 0444;
 		stbuf->st_nlink = 2;
-	} else if (path == hello_path) {
-		stbuf->st_mode = S_IFREG | 0444;
-		stbuf->st_nlink = 1;
-		stbuf->st_size = hello_str.len();
-	} else {
-		res = -ENOENT;
+		return 0;
 	}
 
-	return res;
+	var dirent = DirectoryEntry.find(path);
+	if (dirent == null)
+		return -ENOENT;
+
+	stbuf->st_mode = dirent.mode;
+
+	if (S_ISDIR(dirent.mode)) {
+		stbuf->st_nlink = 2;
+	} else if (S_ISREG(dirent.mode)) {
+		stbuf->st_nlink = 1;
+		stbuf->st_size = 0;
+	}
+
+	return 0;
 }
 
 static int hello_readdir(string path, void *buf, FillDir filler, off_t offset, Fuse.FileInfo fi)

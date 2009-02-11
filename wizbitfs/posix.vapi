@@ -632,6 +632,19 @@ namespace Posix {
 	[CCode (cheader_filename="sys/stat.h", cname="S_ISVTX")]
 	public const mode_t S_ISVTX;
 
+	[CCode (cheader_filename="sys/stat.h", cname="S_ISDIR")]
+	public bool S_ISDIR(mode_t mode);
+	[CCode (cheader_filename="sys/stat.h", cname="S_ISCHR")]
+	public bool S_ISCHR(mode_t mode);
+	[CCode (cheader_filename="sys/stat.h", cname="S_ISBLK")]
+	public bool S_ISBLK(mode_t mode);
+	[CCode (cheader_filename="sys/stat.h", cname="S_ISREG")]
+	public bool S_ISREG(mode_t mode);
+	[CCode (cheader_filename="sys/stat.h", cname="S_ISFIFO")]
+	public bool S_ISFIFO(mode_t mode);
+	[CCode (cheader_filename="sys/stat.h", cname="S_ISLNK")]
+	public bool S_ISLNK(mode_t mode);
+
 	[CCode (cheader_filename="sys/stat.h", cname="struct stat")]
 	public struct stat {
 		public dev_t st_dev;
