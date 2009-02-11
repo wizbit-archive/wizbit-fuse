@@ -12,6 +12,7 @@ class WizbitFuseTest {
 		Environment.set_current_dir(this.directory);
 
 		store = new Wiz.Store("", ".");
+		DirectoryEntry.init();
 	}
 
 	public void teardown(void *fixture) {
@@ -51,15 +52,22 @@ class WizbitFuseTest {
 	}
 
 	public void test_find_missing_node(void *fixture) {
-		this.test_add_child(fixture);
+		DirectoryEntry.root().mkdir("badger", 0);
 		var de = DirectoryEntry.find("/badger/foobar");
 		GLib.assert(de == null);
 	}
 
 	public void test_find_multiple_missing_node(void *fixture) {
-		this.test_add_child(fixture);
+		DirectoryEntry.root().mkdir("badger", 0);
 		var de = DirectoryEntry.find("/badger/foobar/sausage");
 		GLib.assert(de == null);
+	}
+
+	public void test_iter_missing(void *fixture) {
+		DirectoryEntry.root().mkdir("badger", 0);
+		var de = DirectoryEntry.find("/badger");
+		GLib.assert(de != null);
+		foreach (var child in de) {}
 	}
 }
 
@@ -74,8 +82,9 @@ static int main(string [] args)
 	ts.add(new TestCase("test_iter_root", 0, me.setup, me.test_iter_empty_root, me.teardown));
 	ts.add(new TestCase("test_add_child", 0, me.setup, me.test_add_child, me.teardown));
 	ts.add(new TestCase("test_find", 0, me.setup, me.test_add_child, me.teardown));
-	ts.add(new TestCase("test_find_missing_mode", 0, me.setup, me.test_find_missing_node, me.teardown));
+	ts.add(new TestCase("test_find_missing_node", 0, me.setup, me.test_find_missing_node, me.teardown));
 	ts.add(new TestCase("test_find_multiple_missing_node", 0, me.setup, me.test_find_multiple_missing_node, me.teardown));
+	ts.add(new TestCase("test_iter_missing", 0, me.setup, me.test_iter_missing, me.teardown));
 	TestSuite.get_root().add_suite(ts);
 	Test.run();
 

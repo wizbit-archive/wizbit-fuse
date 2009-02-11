@@ -11,12 +11,6 @@ static int hello_getattr(string path, stat *stbuf)
 {
 	Memory.set((void *)stbuf, 0, sizeof(stat));
 
-	if (path == "/") {
-		stbuf->st_mode = S_IFDIR | 0444;
-		stbuf->st_nlink = 2;
-		return 0;
-	}
-
 	var dirent = DirectoryEntry.find(path);
 	if (dirent == null)
 		return -ENOENT;
@@ -50,10 +44,7 @@ static int hello_readdir(string path, void *buf, FillDir filler, off_t offset, F
 
 static int hello_mkdir(string path, mode_t mode)
 {
-	var de = new DirectoryEntry();
-	de.path = Path.get_basename(path);
-	de.mode = mode;
-	DirectoryEntry.find_containing(path).add_child(de);
+	DirectoryEntry.find_containing(path).mkdir(Path.get_basename(path), mode);
 	return 0;
 }
 
@@ -87,6 +78,7 @@ static int hello_read(string path, char *buf, size_t size, off_t offset, Fuse.Fi
 static int main(string [] args)
 {
 	store = new Wiz.Store("", Path.build_filename(Environment.get_home_dir(), "tmp"));
+	DirectoryEntry.init();
 
 	var opers = Operations();
 	opers.readdir = hello_readdir;

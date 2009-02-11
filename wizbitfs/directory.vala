@@ -32,22 +32,22 @@ public class DirectoryEntryIterator {
 
 		while (pos < size && this.buf[pos] != '\t')
 			pos++;
-		de.path = ((string)this.buf).substring(pos, old-pos);
+		de.path = ((string)this.buf).substring(old, pos-old);
 		old = pos = pos+1;
 
 		while (pos < size && this.buf[pos] != '\t')
 			pos++;
-		de.uuid = ((string)this.buf).substring(pos, old-pos);
+		de.uuid = ((string)this.buf).substring(old, pos-old);
 		old = pos = pos+1;
 
 		while (pos < size && this.buf[pos] != '\t')
 			pos++;
-		de.version = ((string)this.buf).substring(pos, old-pos);
+		de.version = ((string)this.buf).substring(old, pos-old);
 		old = pos+1;
 
 		while (pos < size && this.buf[pos] != '\t')
 			pos++;
-		de.mode = ((string)this.buf).substring(pos, old-pos).to_int();
+		de.mode = ((string)this.buf).substring(old, pos-old).to_int();
 		old = pos = pos+1;
 
 		return de;
@@ -79,6 +79,17 @@ public class DirectoryEntry {
 		return null;
 	}
 
+	public void mkdir(string path, mode_t mode) {
+		var bit = store.create_bit();
+		var version = bit.create_next_version_from_string("", null);
+		var de = new DirectoryEntry();
+		de.path = path;
+		de.uuid = bit.uuid;
+		de.version = version.version_uuid;
+		de.mode = mode;
+		this.add_child(de);
+	}
+
 	public void add_child(DirectoryEntry de) {
 		var builder = new StringBuilder();
 		foreach (var thing in this)
@@ -103,14 +114,13 @@ public class DirectoryEntry {
 	}
 
 	public static DirectoryEntry root() {
+		var de = new DirectoryEntry();
+		de.path = "";
+		de.uuid = "ROOT";
 		var version = store.open_bit("ROOT").primary_tip;
-		if (version == null) {
-			var de = new DirectoryEntry();
-			de.uuid = "ROOT";
-			return de;
-		}
-		var iter = new DirectoryEntryIterator("ROOT", version.version_uuid);
-		return iter.get();
+		de.version = version.version_uuid;
+		de.mode = 0;
+		return de;
 	}
 
 	public static DirectoryEntry find(string path) {
@@ -130,6 +140,11 @@ public class DirectoryEntry {
 			return DirectoryEntry.root();
 		else
 			return DirectoryEntry.find(dirname);
+	}
+
+	public static void init() {
+		if (!store.has_bit("ROOT"))
+			store.open_bit("ROOT").create_next_version_from_string("", null);
 	}
 }
 
