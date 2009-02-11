@@ -30,22 +30,22 @@ public class DirectoryEntryIterator {
 
 		var old = pos;
 
-		while (pos < size && this.buf[pos] != '\0')
+		while (pos < size && this.buf[pos] != '\t')
 			pos++;
 		de.path = ((string)this.buf).substring(pos, old-pos);
 		old = pos = pos+1;
 
-		while (pos < size && this.buf[pos] != '\0')
+		while (pos < size && this.buf[pos] != '\t')
 			pos++;
 		de.uuid = ((string)this.buf).substring(pos, old-pos);
 		old = pos = pos+1;
 
-		while (pos < size && this.buf[pos] != '\0')
+		while (pos < size && this.buf[pos] != '\t')
 			pos++;
 		de.version = ((string)this.buf).substring(pos, old-pos);
 		old = pos+1;
 
-		while (pos < size && this.buf[pos] != '\0')
+		while (pos < size && this.buf[pos] != '\t')
 			pos++;
 		de.mode = ((string)this.buf).substring(pos, old-pos).to_int();
 		old = pos = pos+1;
@@ -92,13 +92,13 @@ public class DirectoryEntry {
 	public string as_string() {
 		var builder = new StringBuilder();
 		builder.append(this.path);
-		builder.append_c('\0');
+		builder.append_c('\t');
 		builder.append(this.uuid);
-		builder.append_c('\0');
+		builder.append_c('\t');
 		builder.append(this.version);
-		builder.append_c('\0');
+		builder.append_c('\t');
 		builder.append(((long)this.mode).to_string());
-		builder.append_c('\0');
+		builder.append_c('\t');
 		return builder.str;
 	}
 
@@ -118,7 +118,7 @@ public class DirectoryEntry {
 		var dirent = DirectoryEntry.root();
 		foreach (var chunk in chunks) {
 			dirent = dirent.find_child(chunk);
-			if (dirent != null)
+			if (dirent == null)
 				break;
 		}
 		return dirent;
