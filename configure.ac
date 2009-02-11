@@ -17,6 +17,7 @@ AC_SUBST(WIZBIT_LIBS)
 AC_CONFIG_FILES([
 	Makefile
 	wizbitfs/Makefile
+	tests/Makefile
 ])
 
 AC_OUTPUT

@@ -7,6 +7,7 @@ wizbit_fuse_VALASOURCES = \
 	posix.vapi \
 	fuse.vapi \
 	wizbit.vapi \
+	directory.vala \
 	wizbit-fuse.vala \
 	$(NULL)
 
