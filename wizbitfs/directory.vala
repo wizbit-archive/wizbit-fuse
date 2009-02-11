@@ -27,7 +27,7 @@ public class DirectoryEntryIterator {
 	}
 	public DirectoryEntry get() {
 		var de = new DirectoryEntry();
-
+		
 		var old = pos;
 
 		while (pos < size && this.buf[pos] != '\t')
@@ -43,7 +43,7 @@ public class DirectoryEntryIterator {
 		while (pos < size && this.buf[pos] != '\t')
 			pos++;
 		de.version = ((string)this.buf).substring(old, pos-old);
-		old = pos+1;
+		old = pos = pos+1;
 
 		while (pos < size && this.buf[pos] != '\t')
 			pos++;
