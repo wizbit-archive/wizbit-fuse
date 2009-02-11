@@ -119,7 +119,7 @@ public class DirectoryEntry {
 		de.uuid = "ROOT";
 		var version = store.open_bit("ROOT").primary_tip;
 		de.version = version.version_uuid;
-		de.mode = 0;
+		de.mode = S_IFDIR | 0666;
 		return de;
 	}
 

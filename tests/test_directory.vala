@@ -39,6 +39,16 @@ class WizbitFuseTest {
 		GLib.assert(i==1);
 	}
 
+	public void test_iter_root_with_dir(void *fixture) {
+		DirectoryEntry.root().mkdir("badger", 0);
+		int i = 0;
+		foreach(var child in DirectoryEntry.find("/")) {
+			GLib.assert(child != null);
+			i++;
+		}
+		GLib.assert(i == 1);
+	}
+
 	public void test_add_child(void *fixture) {
 		var de = new DirectoryEntry();
 		de.path = Path.get_basename("/badger");
@@ -80,6 +90,7 @@ static int main(string [] args)
 	var ts = new TestSuite("directory");
 	ts.add(new TestCase("test_iter_empty_root", 0, me.setup, me.test_iter_empty_root, me.teardown));
 	ts.add(new TestCase("test_iter_root", 0, me.setup, me.test_iter_empty_root, me.teardown));
+	ts.add(new TestCase("test_iter_root_with_dir", 0, me.setup, me.test_iter_root_with_dir, me.teardown));
 	ts.add(new TestCase("test_add_child", 0, me.setup, me.test_add_child, me.teardown));
 	ts.add(new TestCase("test_find", 0, me.setup, me.test_add_child, me.teardown));
 	ts.add(new TestCase("test_find_missing_node", 0, me.setup, me.test_find_missing_node, me.teardown));

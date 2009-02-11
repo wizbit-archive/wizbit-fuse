@@ -44,7 +44,7 @@ static int hello_readdir(string path, void *buf, FillDir filler, off_t offset, F
 
 static int hello_mkdir(string path, mode_t mode)
 {
-	DirectoryEntry.find_containing(path).mkdir(Path.get_basename(path), mode);
+	DirectoryEntry.find_containing(path).mkdir(Path.get_basename(path), S_IFDIR|mode);
 	return 0;
 }
 
