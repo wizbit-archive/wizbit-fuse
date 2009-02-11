@@ -33,25 +33,27 @@ public class DirectoryEntryIterator {
 	public DirectoryEntry get() {
 		var de = new DirectoryEntry();
 
-		de.path = (string)this.buf;
-		while (pos < size && this.buf[pos] != '\0')
-			pos++;
-		pos++;
+		var old = pos;
 
-		de.uuid = (string)this.buf;
 		while (pos < size && this.buf[pos] != '\0')
 			pos++;
-		pos++;
+		de.path = ((string)this.buf).substring(pos, old-pos);
+		old = pos = pos+1;
 
-		de.version = (string)this.buf;
 		while (pos < size && this.buf[pos] != '\0')
 			pos++;
-		pos++;
+		de.uuid = ((string)this.buf).substring(pos, old-pos);
+		old = pos = pos+1;
 
-		de.mode = (long)((string)this.buf);
 		while (pos < size && this.buf[pos] != '\0')
 			pos++;
-		pos++;
+		de.version = ((string)this.buf).substring(pos, old-pos);
+		old = pos+1;
+
+		while (pos < size && this.buf[pos] != '\0')
+			pos++;
+		de.mode = ((string)this.buf).substring(pos, old-pos).to_int();
+		old = pos = pos+1;
 
 		return de;
 	}
