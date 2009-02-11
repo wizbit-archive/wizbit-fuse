@@ -86,10 +86,7 @@ static int hello_read(string path, char *buf, size_t size, off_t offset, Fuse.Fi
 
 static int main(string [] args)
 {
-	store = new Wiz.Store("", "~/tmp/");
-
-	if (!store.has_bit("ROOT"))
-		store.open_bit("ROOT").create_next_version_from_string("", null);
+	store = new Wiz.Store("", Path.build_filename(Environment.get_home_dir(), "tmp"));
 
 	var opers = Operations();
 	opers.readdir = hello_readdir;

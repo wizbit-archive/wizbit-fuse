@@ -10,6 +10,8 @@ class WizbitFuseTest {
 		this.olddir = Environment.get_current_dir();
 		this.directory = DirUtils.mkdtemp(Path.build_filename(Environment.get_tmp_dir(), "XXXXXX"));
 		Environment.set_current_dir(this.directory);
+
+		store = new Wiz.Store("", ".");
 	}
 
 	public void teardown(void *fixture) {
@@ -18,9 +20,22 @@ class WizbitFuseTest {
 	}
 
 	public void test_iter_empty_root(void *fixture) {
+		int i = 0;
+		var root = DirectoryEntry.root();
+		foreach (var child in root)
+			i++;
+		GLib.assert(i ==0);
 	}
 	
 	public void test_iter_root(void *fixture) {
+		var n = new DirectoryEntry();
+		n.path = "badger";
+		var root = DirectoryEntry.root();
+		root.add_child(n);
+		int i = 0;
+		foreach (var child in root)
+			i++;
+		GLib.assert(i==1);
 	}
 }
 
