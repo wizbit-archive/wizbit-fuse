@@ -9,6 +9,8 @@ static Wiz.Store store;
 
 static int hello_getattr(string path, stat *stbuf)
 {
+	stdout.printf("getattr('%s')\n", path);
+
 	Memory.set((void *)stbuf, 0, sizeof(stat));
 
 	var dirent = DirectoryEntry.find(path);
@@ -29,6 +31,7 @@ static int hello_getattr(string path, stat *stbuf)
 
 static int hello_readdir(string path, void *buf, FillDir filler, off_t offset, Fuse.FileInfo fi)
 {
+	stdout.printf("readdir('%s')\n", path);
 	var dirent = DirectoryEntry.find(path);
 	if (dirent == null)
 		return -ENOENT;
@@ -44,6 +47,7 @@ static int hello_readdir(string path, void *buf, FillDir filler, off_t offset, F
 
 static int hello_mkdir(string path, mode_t mode)
 {
+	stdout.printf("mkdir('%s')\n", path);
 	DirectoryEntry.find_containing(path).mkdir(Path.get_basename(path), S_IFDIR|mode);
 	return 0;
 }

@@ -11,7 +11,7 @@ public class DirectoryEntryIterator {
 	public DirectoryEntryIterator(string uuid, string? version) {
 		if (store.has_bit(uuid)) {
 			if (version != null && version != "") {
-				this.version = store.open_bit(uuid).open_version(version);
+				this.version = store.open_bit(uuid).primary_tip;
 				this.buf = this.version.read_as_string();
 				this.size = this.version.get_length();
 			} else {
