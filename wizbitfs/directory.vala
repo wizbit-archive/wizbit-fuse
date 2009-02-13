@@ -9,18 +9,18 @@ public class DirectoryEntryIterator {
 	long pos;
 
 	public DirectoryEntryIterator(string uuid, string? version) {
+		this.size = 0;
+		this.pos = 0;
+
 		if (store.has_bit(uuid)) {
-			if (version != null && version != "") {
-				this.version = store.open_bit(uuid).primary_tip;
+			this.version = store.open_bit(uuid).primary_tip;
+			if (this.version != null) {
 				this.buf = this.version.read_as_string();
 				this.size = this.version.get_length();
-			} else {
-				this.size = 0;
 			}
-		} else {
-			this.size = 0;
 		}
-		this.pos = 0;
+
+		stdout.printf("Iterating %s @ %s\n", uuid, version);
 	}
 	public bool next() {
 		return (pos < size);
@@ -88,6 +88,16 @@ public class DirectoryEntry {
 		de.version = version.version_uuid;
 		de.mode = mode;
 		this.add_child(de);
+	}
+
+	public void rm(string path) {
+		var builder = new StringBuilder();
+		foreach (var de in this)
+			if (de.path != path)
+				builder.append(de.as_string());
+
+		var bit = store.open_bit(this.uuid);
+		bit.create_next_version_from_string(builder.str, bit.primary_tip);
 	}
 
 	public void add_child(DirectoryEntry de) {

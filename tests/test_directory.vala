@@ -6,9 +6,19 @@ class WizbitFuseTest {
 	private string olddir;
 	protected string directory;
 
+	void assertIterSize(DirectoryEntry iter, int size) {
+		int i = 0;
+		foreach (var child in iter) {
+			GLib.assert(child != null);
+			i++;
+		}
+		GLib.assert(i == size);
+	}
+
 	public void setup(void *fixture) {
 		this.olddir = Environment.get_current_dir();
 		this.directory = DirUtils.mkdtemp(Path.build_filename(Environment.get_tmp_dir(), "XXXXXX"));
+		stdout.printf("%s\n", this.directory);
 		Environment.set_current_dir(this.directory);
 
 		store = new Wiz.Store("", ".");
@@ -21,11 +31,8 @@ class WizbitFuseTest {
 	}
 
 	public void test_iter_empty_root(void *fixture) {
-		int i = 0;
 		var root = DirectoryEntry.root();
-		foreach (var child in root)
-			i++;
-		GLib.assert(i ==0);
+		assertIterSize(DirectoryEntry.root(), 0);
 	}
 	
 	public void test_iter_root(void *fixture) {
@@ -33,20 +40,12 @@ class WizbitFuseTest {
 		n.path = "badger";
 		var root = DirectoryEntry.root();
 		root.add_child(n);
-		int i = 0;
-		foreach (var child in root)
-			i++;
-		GLib.assert(i==1);
+		assertIterSize(DirectoryEntry.root(), 1);
 	}
 
 	public void test_iter_root_with_dir(void *fixture) {
 		DirectoryEntry.root().mkdir("badger", 0);
-		int i = 0;
-		foreach(var child in DirectoryEntry.find("/")) {
-			GLib.assert(child != null);
-			i++;
-		}
-		GLib.assert(i == 1);
+		assertIterSize(DirectoryEntry.find("/"), 1);
 	}
 
 	public void test_add_child(void *fixture) {
@@ -77,21 +76,25 @@ class WizbitFuseTest {
 		DirectoryEntry.root().mkdir("badger", S_IFDIR);
 		var de = DirectoryEntry.find("/badger");
 		GLib.assert(de != null);
-		foreach (var child in de) {}
+		assertIterSize(de, 0);
 	}
 
 	public void test_iter_child(void *fixture) {
 		DirectoryEntry.root().mkdir("badger", 0);
 		DirectoryEntry.find("/badger").mkdir("sausage", S_IFDIR);
-		int i = 0;
-		foreach (var child in DirectoryEntry.find("/badger/sausage")) {
-			GLib.assert(child != null);
-			i++;
-		}
-		GLib.assert(i == 0);
+		assertIterSize(DirectoryEntry.find("/badger/sausage"), 0);
+
 		var de = DirectoryEntry.find("/badger/sausage");
 		GLib.assert(de.path=="sausage");
 		GLib.assert(S_ISDIR(de.mode));
+	}
+
+	public void test_remove_dirent(void *fixture) {
+		GLib.assert(DirectoryEntry.find("/badger") == null);
+		DirectoryEntry.root().mkdir("badger", 0);
+		GLib.assert(DirectoryEntry.find("/badger") != null);
+		DirectoryEntry.root().rm("badger");
+		GLib.assert(DirectoryEntry.find("/badger") == null);
 	}
 }
 
@@ -111,6 +114,7 @@ static int main(string [] args)
 	ts.add(new TestCase("test_find_multiple_missing_node", 0, me.setup, me.test_find_multiple_missing_node, me.teardown));
 	ts.add(new TestCase("test_iter_missing", 0, me.setup, me.test_iter_missing, me.teardown));
 	ts.add(new TestCase("test_iter_child", 0, me.setup, me.test_iter_missing, me.teardown));
+	ts.add(new TestCase("test_remove_dirent", 0, me.setup, me.test_remove_dirent, me.teardown));
 	TestSuite.get_root().add_suite(ts);
 	Test.run();
 
