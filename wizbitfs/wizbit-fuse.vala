@@ -52,6 +52,13 @@ static int hello_mkdir(string path, mode_t mode)
 	return 0;
 }
 
+static int hello_rmdir(string path)
+{
+	stdout.printf("rmdir('%s')\n", path);
+	DirectoryEntry.find_containing(path).rm(path);
+	return 0;
+}
+
 static int hello_open(string path, Fuse.FileInfo fi)
 {
 	if (path != hello_path)
@@ -87,6 +94,7 @@ static int main(string [] args)
 	var opers = Operations();
 	opers.readdir = hello_readdir;
 	opers.mkdir = hello_mkdir;
+	opers.rmdir = hello_rmdir;
 	opers.getattr = hello_getattr;
 	opers.open = hello_open;
 	opers.read = hello_read;
