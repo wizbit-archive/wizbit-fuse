@@ -96,6 +96,14 @@ class WizbitFuseTest {
 		DirectoryEntry.root().rm("badger");
 		GLib.assert(DirectoryEntry.find("/badger") == null);
 	}
+
+	public void test_remove_dirent_child(void *fixture) {
+		DirectoryEntry.root().mkdir("badger", 0);
+		DirectoryEntry.find("/badger").mkdir("sausage", 0);
+		GLib.assert(DirectoryEntry.find("/badger/sausage") != null);
+		DirectoryEntry.find_containing("/badger/sausage").rm("sausage");
+		GLib.assert(DirectoryEntry.find("/badger/sausage") == null);
+	}
 }
 
 static Wiz.Store store = null;
@@ -115,6 +123,7 @@ static int main(string [] args)
 	ts.add(new TestCase("test_iter_missing", 0, me.setup, me.test_iter_missing, me.teardown));
 	ts.add(new TestCase("test_iter_child", 0, me.setup, me.test_iter_missing, me.teardown));
 	ts.add(new TestCase("test_remove_dirent", 0, me.setup, me.test_remove_dirent, me.teardown));
+	ts.add(new TestCase("test_remove_dirent_child", 0, me.setup, me.test_remove_dirent_child, me.teardown));
 	TestSuite.get_root().add_suite(ts);
 	Test.run();
 
