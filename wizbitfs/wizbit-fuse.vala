@@ -55,7 +55,7 @@ static int hello_mkdir(string path, mode_t mode)
 static int hello_rmdir(string path)
 {
 	stdout.printf("rmdir('%s')\n", path);
-	DirectoryEntry.find_containing(path).rm(path);
+	DirectoryEntry.find_containing(path).rm(Path.get_basename(path));
 	return 0;
 }
 
