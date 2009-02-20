@@ -6,12 +6,10 @@ namespace Wiz {
 	public class Bit : GLib.Object {
 		protected Wiz.BlobStore blobs;
 		public Wiz.CommitStore commits;
-		public GLib.OutputStream create_next_version ();
-		public Wiz.Version create_next_version_from_string (string data, Wiz.Version? parent = null) throws GLib.FileError;
+		public Wiz.CommitBuilder get_commit_builder ();
 		public bool has_version (string uuid);
 		public Bit (string uuid, string? store_path);
 		public Wiz.Version open_version (string uuid);
-		public Wiz.Version test_create_next_version_from_string (string data, Wiz.Version? parent = null, int timestamp);
 		public Wiz.Version? primary_tip { owned get; }
 		public Wiz.Version? root { owned get; }
 		public string store_path { get; construct; }
@@ -61,6 +59,15 @@ namespace Wiz {
 		public int timestamp2 { get; set; }
 		public string uuid { get; set; }
 	}
+	[CCode (ref_function = "wiz_commit_builder_ref", unref_function = "wiz_commit_builder_unref", param_spec_function = "wiz_param_spec_commit_builder", cheader_filename = "wizbit/commit_builder.h")]
+	public class CommitBuilder {
+		public void add_parent (Wiz.Version parent);
+		public Wiz.Version commit ();
+		public CommitBuilder (Wiz.Bit bit);
+		public string blob { set; }
+		public string committer { set; }
+		public int timestamp { set; }
+	}
 	[CCode (cheader_filename = "wizbit/commit_store.h")]
 	public class CommitStore : GLib.Object {
 		public string? get_backward (string version_uuid);
@@ -91,6 +98,7 @@ namespace Wiz {
 	}
 	[CCode (cheader_filename = "wizbit/version.h")]
 	public class Version : GLib.Object {
+		public Wiz.CommitBuilder get_commit_builder ();
 		public long get_length () throws GLib.FileError;
 		public Version (Wiz.Bit bit, string version_uuid);
 		public GLib.InputStream read () throws GLib.FileError;

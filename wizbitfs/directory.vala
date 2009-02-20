@@ -27,7 +27,7 @@ public class DirectoryEntryIterator {
 	}
 	public DirectoryEntry get() {
 		var de = new DirectoryEntry();
-		
+
 		var old = pos;
 
 		while (pos < size && this.buf[pos] != '\t')
@@ -81,7 +81,9 @@ public class DirectoryEntry {
 
 	public void mkdir(string path, mode_t mode) {
 		var bit = store.create_bit();
-		var version = bit.create_next_version_from_string("", null);
+		var cb = bit.get_commit_builder();
+		cb.blob = "";
+		var version = cb.commit();
 		var de = new DirectoryEntry();
 		de.path = path;
 		de.uuid = bit.uuid;
@@ -97,7 +99,11 @@ public class DirectoryEntry {
 				builder.append(de.as_string());
 
 		var bit = store.open_bit(this.uuid);
-		bit.create_next_version_from_string(builder.str, bit.primary_tip);
+		var cb = bit.get_commit_builder();
+		if (bit.primary_tip != null)
+			cb.add_parent(bit.primary_tip);
+		cb.blob = builder.str;
+		cb.commit();
 	}
 
 	public void add_child(DirectoryEntry de) {
@@ -107,7 +113,11 @@ public class DirectoryEntry {
 		builder.append(de.as_string());
 
 		var bit = store.open_bit(this.uuid);
-		bit.create_next_version_from_string(builder.str, bit.primary_tip);
+		var cb = bit.get_commit_builder();
+		if (bit.primary_tip != null)
+			cb.add_parent(bit.primary_tip);
+		cb.blob = builder.str;
+		cb.commit();
 	}
 
 	public string as_string() {
@@ -153,8 +163,11 @@ public class DirectoryEntry {
 	}
 
 	public static void init() {
-		if (!store.has_bit("ROOT"))
-			store.open_bit("ROOT").create_next_version_from_string("", null);
+		if (!store.has_bit("ROOT")) {
+			var cb = store.open_bit("ROOT").get_commit_builder();
+			cb.blob = "";
+			cb.commit();
+		}
 	}
 }
 
