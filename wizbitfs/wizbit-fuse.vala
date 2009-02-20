@@ -84,6 +84,16 @@ static int wizfs_read(string path, char *buf, size_t size, off_t offset, Fuse.Fi
 	return (int)size;
 }
 
+static int wizfs_write(string path, char *buf, size_t size, off_t offset, Fuse.FileInfo fi)
+{
+	return -EACCES;
+}
+
+static int wizfs_release(string path, Fuse.FileInfo fi)
+{
+	return 0;
+}
+
 static int main(string [] args)
 {
 	store = new Wiz.Store("", Path.build_filename(Environment.get_home_dir(), "tmp"));
@@ -96,6 +106,8 @@ static int main(string [] args)
 	opers.getattr = wizfs_getattr;
 	opers.open = wizfs_open;
 	opers.read = wizfs_read;
+	opers.write = wizfs_write;
+	opers.release = wizfs_release;
 
 	return Fuse.main(args, opers, null);
 }
