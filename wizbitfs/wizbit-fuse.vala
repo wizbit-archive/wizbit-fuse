@@ -58,6 +58,8 @@ static int wizfs_rmdir(string path)
 
 static int wizfs_open(string path, Fuse.FileInfo fi)
 {
+	stdout.printf("open('%s')\n", path);
+
 	var de = DirectoryEntry.find(path);
 	if (de == null)
 		return -ENOENT;
@@ -72,6 +74,8 @@ static int wizfs_open(string path, Fuse.FileInfo fi)
 
 static int wizfs_read(string path, char *buf, size_t size, off_t offset, Fuse.FileInfo fi)
 {
+	stdout.printf("read('%s', %l, %l)\n", path, (long) size, (long) offset);
+
 	string wizfs_str = "TEST STRING TEST STRING";
 	var len = wizfs_str.len();
 	if (offset < len) {
@@ -86,11 +90,15 @@ static int wizfs_read(string path, char *buf, size_t size, off_t offset, Fuse.Fi
 
 static int wizfs_write(string path, char *buf, size_t size, off_t offset, Fuse.FileInfo fi)
 {
+	stdout.printf("write('%s', %l, %l)\n", path, (long) size, (long) offset);
+
 	return -EACCES;
 }
 
 static int wizfs_release(string path, Fuse.FileInfo fi)
 {
+	stdout.printf("release('%s')\n", path);
+
 	return 0;
 }
 
