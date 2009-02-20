@@ -2,12 +2,9 @@ using Fuse;
 using Posix;
 using Wiz;
 
-static const string hello_str = "Hello World!\n";
-static const string hello_path = "/hello";
-
 static Wiz.Store store;
 
-static int hello_getattr(string path, stat *stbuf)
+static int wizfs_getattr(string path, stat *stbuf)
 {
 	stdout.printf("getattr('%s')\n", path);
 
@@ -29,7 +26,7 @@ static int hello_getattr(string path, stat *stbuf)
 	return 0;
 }
 
-static int hello_readdir(string path, void *buf, FillDir filler, off_t offset, Fuse.FileInfo fi)
+static int wizfs_readdir(string path, void *buf, FillDir filler, off_t offset, Fuse.FileInfo fi)
 {
 	stdout.printf("readdir('%s')\n", path);
 	var dirent = DirectoryEntry.find(path);
@@ -45,25 +42,27 @@ static int hello_readdir(string path, void *buf, FillDir filler, off_t offset, F
 	return 0;
 }
 
-static int hello_mkdir(string path, mode_t mode)
+static int wizfs_mkdir(string path, mode_t mode)
 {
 	stdout.printf("mkdir('%s')\n", path);
 	DirectoryEntry.find_containing(path).mkdir(Path.get_basename(path), S_IFDIR|mode);
 	return 0;
 }
 
-static int hello_rmdir(string path)
+static int wizfs_rmdir(string path)
 {
 	stdout.printf("rmdir('%s')\n", path);
 	DirectoryEntry.find_containing(path).rm(Path.get_basename(path));
 	return 0;
 }
 
-static int hello_open(string path, Fuse.FileInfo fi)
+static int wizfs_open(string path, Fuse.FileInfo fi)
 {
-	if (path != hello_path)
+	var de = DirectoryEntry.find(path);
+	if (de == null)
 		return -ENOENT;
 
+	// All files are read only
 	if ((fi.flags & 3) != O_RDONLY)
 		return -EACCES;
 
@@ -71,15 +70,14 @@ static int hello_open(string path, Fuse.FileInfo fi)
 }
 
 
-static int hello_read(string path, char *buf, size_t size, off_t offset, Fuse.FileInfo fi)
+static int wizfs_read(string path, char *buf, size_t size, off_t offset, Fuse.FileInfo fi)
 {
-	if (path != hello_path)
-		return -ENOENT;
-	var len = hello_str.len();
+	string wizfs_str = "TEST STRING TEST STRING";
+	var len = wizfs_str.len();
 	if (offset < len) {
 		if (offset + size > len)
 			size = len - offset;
-		Memory.copy(buf, (char *)hello_str + offset, size);
+		Memory.copy(buf, (char *)wizfs_str + offset, size);
 	} else {
 		size = 0;
 	}
@@ -92,12 +90,12 @@ static int main(string [] args)
 	DirectoryEntry.init();
 
 	var opers = Operations();
-	opers.readdir = hello_readdir;
-	opers.mkdir = hello_mkdir;
-	opers.rmdir = hello_rmdir;
-	opers.getattr = hello_getattr;
-	opers.open = hello_open;
-	opers.read = hello_read;
+	opers.readdir = wizfs_readdir;
+	opers.mkdir = wizfs_mkdir;
+	opers.rmdir = wizfs_rmdir;
+	opers.getattr = wizfs_getattr;
+	opers.open = wizfs_open;
+	opers.read = wizfs_read;
 
 	return Fuse.main(args, opers, null);
 }
