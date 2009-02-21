@@ -1,5 +1,5 @@
 
-noinst_PROGRAMS=wizbit-fuse
+bin_PROGRAMS=wizbit-fuse
 
 BUILT_SOURCES = wizbit-fuse.vala.stamp
 
