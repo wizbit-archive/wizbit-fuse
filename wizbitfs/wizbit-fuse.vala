@@ -3,6 +3,7 @@ using Posix;
 using Wiz;
 
 static Wiz.Store store;
+static Wiz.Version[255] versions;
 
 static int wizfs_getattr(string path, stat *stbuf)
 {
@@ -26,7 +27,7 @@ static int wizfs_getattr(string path, stat *stbuf)
 	return 0;
 }
 
-static int wizfs_readdir(string path, void *buf, FillDir filler, off_t offset, Fuse.FileInfo fi)
+static int wizfs_readdir(string path, void *buf, FillDir filler, off_t offset, ref Fuse.FileInfo fi)
 {
 	stdout.printf("readdir('%s')\n", path);
 	var dirent = DirectoryEntry.find(path);
@@ -56,7 +57,7 @@ static int wizfs_rmdir(string path)
 	return 0;
 }
 
-static int wizfs_open(string path, Fuse.FileInfo fi)
+static int wizfs_open(string path, ref Fuse.FileInfo fi)
 {
 	stdout.printf("open('%s')\n", path);
 
@@ -64,15 +65,27 @@ static int wizfs_open(string path, Fuse.FileInfo fi)
 	if (de == null)
 		return -ENOENT;
 
-	// All files are read only
-	if ((fi.flags & 3) != O_RDONLY)
+	// Find an empty slot
+	int fd = -1;
+	for (int i=0; i<255; i++) {
+		if (versions[i] == null) {
+			fd = i;
+			break;	
+		}
+	}
+
+	// If we don't have an open slot, return 'you can not has' error
+	if (fd == -1)
 		return -EACCES;
+
+	versions[fd] = store.open_bit(de.uuid).primary_tip;
+	fi.fh = fd;
 
 	return 0;
 }
 
 
-static int wizfs_read(string path, char *buf, size_t size, off_t offset, Fuse.FileInfo fi)
+static int wizfs_read(string path, char *buf, size_t size, off_t offset, ref Fuse.FileInfo fi)
 {
 	stdout.printf("read('%s', %l, %l)\n", path, (long) size, (long) offset);
 
@@ -88,16 +101,24 @@ static int wizfs_read(string path, char *buf, size_t size, off_t offset, Fuse.Fi
 	return (int)size;
 }
 
-static int wizfs_write(string path, char *buf, size_t size, off_t offset, Fuse.FileInfo fi)
+static int wizfs_write(string path, char *buf, size_t size, off_t offset, ref Fuse.FileInfo fi)
 {
 	stdout.printf("write('%s', %l, %l)\n", path, (long) size, (long) offset);
 
 	return -EACCES;
 }
 
-static int wizfs_release(string path, Fuse.FileInfo fi)
+static int wizfs_release(string path, ref Fuse.FileInfo fi)
 {
 	stdout.printf("release('%s')\n", path);
+
+	if (fi.fh < 0 || fi.fh > 255)
+		return -ENOENT;
+
+	if (versions[fi.fh] == null)
+		return -ENOENT;
+
+	versions[fi.fh] = null;
 
 	return 0;
 }

@@ -36,7 +36,7 @@ namespace Fuse {
 	public static delegate int GetAttr(string path, stat *st);
 	public static delegate int Access(string path, int mask);
 	public static delegate int ReadLink(string path, char *buf, size_t size);
-	public static delegate int ReadDir(string path, void *buf, FillDir filler, off_t offset, FileInfo fi);
+	public static delegate int ReadDir(string path, void *buf, FillDir filler, off_t offset, ref FileInfo fi);
 	public static delegate int MkNod(string path, mode_t mode, dev_t rdev);
 	public static delegate int MkDir(string path, mode_t mode);
 	public static delegate int Unlink(string path);
@@ -48,12 +48,12 @@ namespace Fuse {
 	public static delegate int Chown(string path, uid_t uid, gid_t gid);
 	public static delegate int Truncate(string path, off_t size);
 	public static delegate int Utimens(string path, timespec[2] ts);
-	public static delegate int Open(string path, FileInfo fi);
-	public static delegate int Read(string path, char *buf, size_t size, off_t offset, FileInfo fi);
-	public static delegate int Write(string path, char *buf, size_t size, off_t offset, FileInfo fi);
+	public static delegate int Open(string path, ref FileInfo fi);
+	public static delegate int Read(string path, char *buf, size_t size, off_t offset, ref FileInfo fi);
+	public static delegate int Write(string path, char *buf, size_t size, off_t offset, ref FileInfo fi);
 	public static delegate int StatFs(string path, statvfs *stbuf);
-	public static delegate int Release(string path, FileInfo fi);
-	public static delegate int Fsync(string path, int isdatasync, FileInfo fi);
+	public static delegate int Release(string path, ref FileInfo fi);
+	public static delegate int Fsync(string path, int isdatasync, ref FileInfo fi);
 
 	public static delegate int SetXAttr(string path, string name, char *value, size_t size, int flags);
 	public static delegate int GetXAttr(string path, string name, char *value, size_t size);
