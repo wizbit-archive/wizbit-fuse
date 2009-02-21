@@ -89,16 +89,21 @@ static int wizfs_read(string path, char *buf, size_t size, off_t offset, ref Fus
 {
 	stdout.printf("read('%s', %l, %l)\n", path, (long) size, (long) offset);
 
-	string wizfs_str = "TEST STRING TEST STRING";
-	var len = wizfs_str.len();
+	if (fi.fh < 0 || fi.fh > 255 || versions[fi.fh] == null)
+		return -ENOENT;
+
+	char *blob = versions[fi.fh].read_as_string();
+	long len = versions[fi.fh].get_length();
+
 	if (offset < len) {
 		if (offset + size > len)
 			size = len - offset;
-		Memory.copy(buf, (char *)wizfs_str + offset, size);
+		Memory.copy(buf, blob + offset, size);
 	} else {
 		size = 0;
 	}
-	return (int)size;
+
+	return (int) size;
 }
 
 static int wizfs_write(string path, char *buf, size_t size, off_t offset, ref Fuse.FileInfo fi)
