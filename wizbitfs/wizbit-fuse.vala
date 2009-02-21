@@ -6,11 +6,11 @@ static Wiz.Store store;
 static Wiz.Version[255] versions;
 static StringBuilder[255] new_blobs;
 
-static Wiz.Version? get_version_from_fh(ref Fuse.FileInfo fi)
+static Wiz.Version? get_version_from_fh(uint64 fh)
 {
-	if (fi.fh < 0 || fi.fh > 255)
+	if (fh < 0 || fh > 255)
 		return null;
-	return versions[fi.fh];
+	return versions[fh];
 }
 
 static int wizfs_getattr(string path, stat *stbuf)
@@ -97,7 +97,7 @@ static int wizfs_read(string path, char *buf, size_t size, off_t offset, ref Fus
 {
 	stdout.printf("read('%s', %l, %l)\n", path, (long) size, (long) offset);
 
-	var version = get_version_from_fh(fi);
+	var version = get_version_from_fh(fi.fh);
 	if (version == null)
 		return -ENOENT;
 
@@ -119,7 +119,7 @@ static int wizfs_write(string path, char *buf, size_t size, off_t offset, ref Fu
 {
 	stdout.printf("write('%s', %l, %l)\n", path, (long) size, (long) offset);
 
-	var version = get_version_from_fh(fi);
+	var version = get_version_from_fh(fi.fh);
 	if (version == null)
 		return -ENOENT;
 
@@ -135,7 +135,7 @@ static int wizfs_release(string path, ref Fuse.FileInfo fi)
 {
 	stdout.printf("release('%s')\n", path);
 
-	var version = get_version_from_fh(fi);
+	var version = get_version_from_fh(fi.fh);
 	if (version == null)
 		return -ENOENT;
 
