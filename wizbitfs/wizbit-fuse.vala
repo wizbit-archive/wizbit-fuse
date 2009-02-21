@@ -4,6 +4,7 @@ using Wiz;
 
 static Wiz.Store store;
 static Wiz.Version[255] versions;
+static StringBuilder[255] new_blobs;
 
 static int wizfs_getattr(string path, stat *stbuf)
 {
@@ -110,6 +111,14 @@ static int wizfs_write(string path, char *buf, size_t size, off_t offset, ref Fu
 {
 	stdout.printf("write('%s', %l, %l)\n", path, (long) size, (long) offset);
 
+	if (fi.fh < 0 || fi.fh > 255 || versions[fi.fh] == null)
+		return -ENOENT;
+
+	if (new_blobs[fi.fh] == null)
+		new_blobs[fi.fh] = new StringBuilder();
+
+	new_blobs[fi.fh].append("%.*s".printf(size, buf));
+
 	return -EACCES;
 }
 
@@ -122,6 +131,12 @@ static int wizfs_release(string path, ref Fuse.FileInfo fi)
 
 	if (versions[fi.fh] == null)
 		return -ENOENT;
+
+	if (new_blobs[fi.fh] != null) {
+		var cb = versions[fi.fh].get_commit_builder();
+		cb.blob = new_blobs[fi.fh].str;
+		cb.commit();
+	}
 
 	versions[fi.fh] = null;
 
