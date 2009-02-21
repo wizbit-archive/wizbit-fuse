@@ -6,6 +6,13 @@ static Wiz.Store store;
 static Wiz.Version[255] versions;
 static StringBuilder[255] new_blobs;
 
+static Wiz.Version? get_version_from_fh(ref Fuse.FileInfo fi)
+{
+	if (fi.fh < 0 || fi.fh > 255)
+		return null;
+	return versions[fi.fh];
+}
+
 static int wizfs_getattr(string path, stat *stbuf)
 {
 	stdout.printf("getattr('%s')\n", path);
@@ -90,11 +97,12 @@ static int wizfs_read(string path, char *buf, size_t size, off_t offset, ref Fus
 {
 	stdout.printf("read('%s', %l, %l)\n", path, (long) size, (long) offset);
 
-	if (fi.fh < 0 || fi.fh > 255 || versions[fi.fh] == null)
+	var version = get_version_from_fh(fi);
+	if (version == null)
 		return -ENOENT;
 
-	char *blob = versions[fi.fh].read_as_string();
-	long len = versions[fi.fh].get_length();
+	char *blob = version.read_as_string();
+	long len = version.get_length();
 
 	if (offset < len) {
 		if (offset + size > len)
@@ -111,7 +119,8 @@ static int wizfs_write(string path, char *buf, size_t size, off_t offset, ref Fu
 {
 	stdout.printf("write('%s', %l, %l)\n", path, (long) size, (long) offset);
 
-	if (fi.fh < 0 || fi.fh > 255 || versions[fi.fh] == null)
+	var version = get_version_from_fh(fi);
+	if (version == null)
 		return -ENOENT;
 
 	if (new_blobs[fi.fh] == null)
@@ -126,14 +135,12 @@ static int wizfs_release(string path, ref Fuse.FileInfo fi)
 {
 	stdout.printf("release('%s')\n", path);
 
-	if (fi.fh < 0 || fi.fh > 255)
-		return -ENOENT;
-
-	if (versions[fi.fh] == null)
+	var version = get_version_from_fh(fi);
+	if (version == null)
 		return -ENOENT;
 
 	if (new_blobs[fi.fh] != null) {
-		var cb = versions[fi.fh].get_commit_builder();
+		var cb = version.get_commit_builder();
 		cb.blob = new_blobs[fi.fh].str;
 		cb.commit();
 	}
