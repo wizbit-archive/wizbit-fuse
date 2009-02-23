@@ -51,6 +51,30 @@ static int wizfs_readdir(string path, void *buf, FillDir filler, off_t offset, r
 	return 0;
 }
 
+static int wizfs_mknod(string path, mode_t mode, dev_t rdev)
+{
+	stdout.printf("mknod('%s')\n", path);
+
+	var bit = store.create_bit();
+
+	// Always start from an empty string
+	var cb = bit.get_commit_builder();
+	cb.blob = "";
+	var v = cb.commit();
+
+	var parent = DirectoryEntry.find_containing(path);
+
+	var de = new DirectoryEntry();
+	de.path = Path.get_basename(path);
+	de.uuid = bit.uuid;
+	de.version = v.version_uuid;
+	de.mode = mode;
+	
+	parent.add_child(de);
+
+	return 0;
+}
+
 static int wizfs_mkdir(string path, mode_t mode)
 {
 	stdout.printf("mkdir('%s')\n", path);
@@ -153,6 +177,8 @@ static int wizfs_release(string path, ref Fuse.FileInfo fi)
 static int main(string [] args)
 {
 	store = new Wiz.Store("", Path.build_filename(Environment.get_home_dir(), "tmp"));
+	versions = new Wiz.Version[255];
+	new_blobs = new StringBuilder[255];
 	DirectoryEntry.init();
 
 	var opers = Operations();
@@ -160,6 +186,7 @@ static int main(string [] args)
 	opers.mkdir = wizfs_mkdir;
 	opers.rmdir = wizfs_rmdir;
 	opers.getattr = wizfs_getattr;
+	opers.mknod = wizfs_mknod;
 	opers.open = wizfs_open;
 	opers.read = wizfs_read;
 	opers.write = wizfs_write;
