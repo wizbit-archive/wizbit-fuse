@@ -15,8 +15,6 @@ static Wiz.Version? get_version_from_fh(uint64 fh)
 
 static int wizfs_getattr(string path, stat *stbuf)
 {
-	stdout.printf("getattr('%s')\n", path);
-
 	Memory.set((void *)stbuf, 0, sizeof(stat));
 
 	var dirent = DirectoryEntry.find(path);
@@ -37,7 +35,6 @@ static int wizfs_getattr(string path, stat *stbuf)
 
 static int wizfs_readdir(string path, void *buf, FillDir filler, off_t offset, ref Fuse.FileInfo fi)
 {
-	stdout.printf("readdir('%s')\n", path);
 	var dirent = DirectoryEntry.find(path);
 	if (dirent == null)
 		return -ENOENT;
@@ -53,8 +50,6 @@ static int wizfs_readdir(string path, void *buf, FillDir filler, off_t offset, r
 
 static int wizfs_mknod(string path, mode_t mode, dev_t rdev)
 {
-	stdout.printf("mknod('%s')\n", path);
-
 	var bit = store.create_bit();
 
 	// Always start from an empty string
@@ -75,24 +70,34 @@ static int wizfs_mknod(string path, mode_t mode, dev_t rdev)
 	return 0;
 }
 
+int wizfs_unlink(string path)
+{
+	DirectoryEntry.find_containing(path).rm(Path.get_basename(path));
+	return 0;
+}
+
+static int wizfs_utimens(string path, timespec[2] ts)
+{
+	// Pretend this worked when really we don't try to
+	// implement it (create/mod times come from DAG)
+
+	return 0;
+}
+
 static int wizfs_mkdir(string path, mode_t mode)
 {
-	stdout.printf("mkdir('%s')\n", path);
 	DirectoryEntry.find_containing(path).mkdir(Path.get_basename(path), S_IFDIR|mode);
 	return 0;
 }
 
 static int wizfs_rmdir(string path)
 {
-	stdout.printf("rmdir('%s')\n", path);
 	DirectoryEntry.find_containing(path).rm(Path.get_basename(path));
 	return 0;
 }
 
 static int wizfs_open(string path, ref Fuse.FileInfo fi)
 {
-	stdout.printf("open('%s')\n", path);
-
 	var de = DirectoryEntry.find(path);
 	if (de == null)
 		return -ENOENT;
@@ -119,8 +124,6 @@ static int wizfs_open(string path, ref Fuse.FileInfo fi)
 
 static int wizfs_read(string path, char *buf, size_t size, off_t offset, ref Fuse.FileInfo fi)
 {
-	stdout.printf("read('%s', %l, %l)\n", path, (long) size, (long) offset);
-
 	var version = get_version_from_fh(fi.fh);
 	if (version == null)
 		return -ENOENT;
@@ -141,8 +144,6 @@ static int wizfs_read(string path, char *buf, size_t size, off_t offset, ref Fus
 
 static int wizfs_write(string path, char *buf, size_t size, off_t offset, ref Fuse.FileInfo fi)
 {
-	stdout.printf("write('%s', %l, %l)\n", path, (long) size, (long) offset);
-
 	var version = get_version_from_fh(fi.fh);
 	if (version == null)
 		return -ENOENT;
@@ -157,8 +158,6 @@ static int wizfs_write(string path, char *buf, size_t size, off_t offset, ref Fu
 
 static int wizfs_release(string path, ref Fuse.FileInfo fi)
 {
-	stdout.printf("release('%s')\n", path);
-
 	var version = get_version_from_fh(fi.fh);
 	if (version == null)
 		return -ENOENT;
@@ -187,10 +186,12 @@ static int main(string [] args)
 	opers.rmdir = wizfs_rmdir;
 	opers.getattr = wizfs_getattr;
 	opers.mknod = wizfs_mknod;
+	opers.utimens = wizfs_utimens;
 	opers.open = wizfs_open;
 	opers.read = wizfs_read;
 	opers.write = wizfs_write;
 	opers.release = wizfs_release;
+	opers.unlink = wizfs_unlink;
 
 	return Fuse.main(args, opers, null);
 }

@@ -525,7 +525,7 @@ namespace Posix {
 		public int tm_isdt;
 	}
 
-	[CCode (cheader_filename="time.h")]
+	[CCode (cheader_filename="time.h", cname="struct timespec")]
 	public struct timespec {
 		time_t tv_sec;
 		long tv_nsec;
