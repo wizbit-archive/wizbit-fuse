@@ -6,14 +6,14 @@ static Wiz.Store store;
 static Wiz.Version[255] versions;
 static StringBuilder[255] new_blobs;
 
-static Wiz.Version? get_version_from_fh(uint64 fh)
+Wiz.Version? get_version_from_fh(uint64 fh)
 {
 	if (fh < 0 || fh > 255)
 		return null;
 	return versions[fh];
 }
 
-static int wizfs_getattr(string path, stat *stbuf)
+int wizfs_getattr(string path, stat *stbuf)
 {
 	Memory.set((void *)stbuf, 0, sizeof(stat));
 
@@ -33,7 +33,7 @@ static int wizfs_getattr(string path, stat *stbuf)
 	return 0;
 }
 
-static int wizfs_readdir(string path, void *buf, FillDir filler, off_t offset, ref Fuse.FileInfo fi)
+int wizfs_readdir(string path, void *buf, FillDir filler, off_t offset, ref Fuse.FileInfo fi)
 {
 	var dirent = DirectoryEntry.find(path);
 	if (dirent == null)
@@ -48,7 +48,7 @@ static int wizfs_readdir(string path, void *buf, FillDir filler, off_t offset, r
 	return 0;
 }
 
-static int wizfs_mknod(string path, mode_t mode, dev_t rdev)
+int wizfs_mknod(string path, mode_t mode, dev_t rdev)
 {
 	var bit = store.create_bit();
 
@@ -76,7 +76,7 @@ int wizfs_unlink(string path)
 	return 0;
 }
 
-static int wizfs_utimens(string path, timespec[2] ts)
+int wizfs_utimens(string path, timespec[2] ts)
 {
 	// Pretend this worked when really we don't try to
 	// implement it (create/mod times come from DAG)
@@ -84,19 +84,19 @@ static int wizfs_utimens(string path, timespec[2] ts)
 	return 0;
 }
 
-static int wizfs_mkdir(string path, mode_t mode)
+int wizfs_mkdir(string path, mode_t mode)
 {
 	DirectoryEntry.find_containing(path).mkdir(Path.get_basename(path), S_IFDIR|mode);
 	return 0;
 }
 
-static int wizfs_rmdir(string path)
+int wizfs_rmdir(string path)
 {
 	DirectoryEntry.find_containing(path).rm(Path.get_basename(path));
 	return 0;
 }
 
-static int wizfs_open(string path, ref Fuse.FileInfo fi)
+int wizfs_open(string path, ref Fuse.FileInfo fi)
 {
 	var de = DirectoryEntry.find(path);
 	if (de == null)
@@ -122,7 +122,7 @@ static int wizfs_open(string path, ref Fuse.FileInfo fi)
 }
 
 
-static int wizfs_read(string path, char *buf, size_t size, off_t offset, ref Fuse.FileInfo fi)
+int wizfs_read(string path, char *buf, size_t size, off_t offset, ref Fuse.FileInfo fi)
 {
 	var version = get_version_from_fh(fi.fh);
 	if (version == null)
@@ -142,7 +142,7 @@ static int wizfs_read(string path, char *buf, size_t size, off_t offset, ref Fus
 	return (int) size;
 }
 
-static int wizfs_write(string path, char *buf, size_t size, off_t offset, ref Fuse.FileInfo fi)
+int wizfs_write(string path, char *buf, size_t size, off_t offset, ref Fuse.FileInfo fi)
 {
 	var version = get_version_from_fh(fi.fh);
 	if (version == null)
@@ -153,10 +153,10 @@ static int wizfs_write(string path, char *buf, size_t size, off_t offset, ref Fu
 
 	new_blobs[fi.fh].append("%.*s".printf(size, buf));
 
-	return -EACCES;
+	return (int) size;
 }
 
-static int wizfs_release(string path, ref Fuse.FileInfo fi)
+int wizfs_release(string path, ref Fuse.FileInfo fi)
 {
 	var version = get_version_from_fh(fi.fh);
 	if (version == null)
