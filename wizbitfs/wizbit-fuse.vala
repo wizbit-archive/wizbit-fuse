@@ -21,13 +21,15 @@ int wizfs_getattr(string path, stat *stbuf)
 	if (dirent == null)
 		return -ENOENT;
 
+	var version = store.open_bit(dirent.uuid).primary_tip;
+
 	stbuf->st_mode = dirent.mode;
 
 	if (S_ISDIR(dirent.mode)) {
 		stbuf->st_nlink = 2;
 	} else if (S_ISREG(dirent.mode)) {
 		stbuf->st_nlink = 1;
-		stbuf->st_size = 0;
+		stbuf->st_size = version.get_length();
 	}
 
 	return 0;
