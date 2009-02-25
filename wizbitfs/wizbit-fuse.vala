@@ -56,7 +56,9 @@ int wizfs_mknod(string path, mode_t mode, dev_t rdev)
 
 	// Always start from an empty string
 	var cb = bit.get_commit_builder();
-	cb.blob = "";
+	var f = new Wiz.File();
+	f.set_contents("");
+	cb.file = f;
 	var v = cb.commit();
 
 	var parent = DirectoryEntry.find_containing(path);
@@ -160,13 +162,15 @@ int wizfs_write(string path, char *buf, size_t size, off_t offset, ref Fuse.File
 
 int wizfs_release(string path, ref Fuse.FileInfo fi)
 {
-	var version = get_version_from_fh(fi.fh);
-	if (version == null)
+	var commit = get_version_from_fh(fi.fh);
+	if (commit == null)
 		return -ENOENT;
 
 	if (new_blobs[fi.fh] != null) {
-		var cb = version.get_commit_builder();
-		cb.blob = new_blobs[fi.fh].str;
+		var cb = commit.get_commit_builder();
+		var f = commit.file;
+		f.set_contents(new_blobs[fi.fh].str);
+		cb.file = f;
 		cb.commit();
 	}
 
