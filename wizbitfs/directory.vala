@@ -3,7 +3,7 @@ using Posix;
 using Wiz;
 
 public class DirectoryEntryIterator {
-	Wiz.Version version;
+	Wiz.Commit commit;
 	char *buf;
 	long size;
 	long pos;
@@ -13,14 +13,12 @@ public class DirectoryEntryIterator {
 		this.pos = 0;
 
 		if (store.has_bit(uuid)) {
-			this.version = store.open_bit(uuid).primary_tip;
-			if (this.version != null) {
-				this.buf = this.version.read_as_string();
-				this.size = this.version.get_length();
+			this.commit = store.open_bit(uuid).primary_tip;
+			if (this.commit != null) {
+				this.buf = this.commit.read_as_string();
+				this.size = this.commit.get_length();
 			}
 		}
-
-		stdout.printf("Iterating %s @ %s\n", uuid, version);
 	}
 	public bool next() {
 		return (pos < size);
@@ -83,11 +81,11 @@ public class DirectoryEntry {
 		var bit = store.create_bit();
 		var cb = bit.get_commit_builder();
 		cb.blob = "";
-		var version = cb.commit();
+		var commit = cb.commit();
 		var de = new DirectoryEntry();
 		de.path = path;
 		de.uuid = bit.uuid;
-		de.version = version.version_uuid;
+		de.version = commit.version_uuid;
 		de.mode = mode;
 		this.add_child(de);
 	}
@@ -137,8 +135,8 @@ public class DirectoryEntry {
 		var de = new DirectoryEntry();
 		de.path = "";
 		de.uuid = "ROOT";
-		var version = store.open_bit("ROOT").primary_tip;
-		de.version = version.version_uuid;
+		var commit = store.open_bit("ROOT").primary_tip;
+		de.version = commit.version_uuid;
 		de.mode = S_IFDIR | 0666;
 		return de;
 	}

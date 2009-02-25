@@ -3,10 +3,10 @@ using Posix;
 using Wiz;
 
 static Wiz.Store store;
-static Wiz.Version[255] versions;
+static Wiz.Commit[255] versions;
 static StringBuilder[255] new_blobs;
 
-Wiz.Version? get_version_from_fh(uint64 fh)
+Wiz.Commit? get_version_from_fh(uint64 fh)
 {
 	if (fh < 0 || fh > 255)
 		return null;
@@ -178,7 +178,7 @@ int wizfs_release(string path, ref Fuse.FileInfo fi)
 static int main(string [] args)
 {
 	store = new Wiz.Store("", Path.build_filename(Environment.get_home_dir(), "tmp"));
-	versions = new Wiz.Version[255];
+	versions = new Wiz.Commit[255];
 	new_blobs = new StringBuilder[255];
 	DirectoryEntry.init();
 
