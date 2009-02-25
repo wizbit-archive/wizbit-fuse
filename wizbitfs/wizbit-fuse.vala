@@ -128,12 +128,13 @@ int wizfs_open(string path, ref Fuse.FileInfo fi)
 
 int wizfs_read(string path, char *buf, size_t size, off_t offset, ref Fuse.FileInfo fi)
 {
-	var version = get_version_from_fh(fi.fh);
-	if (version == null)
+	var commit = get_version_from_fh(fi.fh);
+	if (commit == null)
 		return -ENOENT;
 
-	char *blob = version.read_as_string();
-	long len = version.get_length();
+	var mf = commit.file.get_mapped_file();
+	char *blob = mf.get_contents();
+	long len = mf.get_length();
 
 	if (offset < len) {
 		if (offset + size > len)
