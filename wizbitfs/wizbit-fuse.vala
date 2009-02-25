@@ -21,7 +21,8 @@ int wizfs_getattr(string path, stat *stbuf)
 	if (dirent == null)
 		return -ENOENT;
 
-	var version = store.open_bit(dirent.uuid).primary_tip;
+	var commit = store.open_bit(dirent.uuid).primary_tip;
+	var mf = commit.file.get_mapped_file();
 
 	stbuf->st_mode = dirent.mode;
 
@@ -29,7 +30,7 @@ int wizfs_getattr(string path, stat *stbuf)
 		stbuf->st_nlink = 2;
 	} else if (S_ISREG(dirent.mode)) {
 		stbuf->st_nlink = 1;
-		stbuf->st_size = version.get_length();
+		stbuf->st_size = mf.get_length();
 	}
 
 	return 0;
