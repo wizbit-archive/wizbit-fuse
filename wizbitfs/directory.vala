@@ -4,6 +4,7 @@ using Wiz;
 
 public class DirectoryEntryIterator {
 	Wiz.Commit commit;
+	MappedFile mf;
 	char *buf;
 	long size;
 	long pos;
@@ -15,8 +16,9 @@ public class DirectoryEntryIterator {
 		if (store.has_bit(uuid)) {
 			this.commit = store.open_bit(uuid).primary_tip;
 			if (this.commit != null) {
-				this.buf = this.commit.read_as_string();
-				this.size = this.commit.get_length();
+				this.mf = this.commit.file.get_mapped_file();
+				this.buf = this.mf.get_contents();
+				this.size = this.mf.get_length();
 			}
 		}
 	}
@@ -80,7 +82,9 @@ public class DirectoryEntry {
 	public void mkdir(string path, mode_t mode) {
 		var bit = store.create_bit();
 		var cb = bit.get_commit_builder();
-		cb.blob = "";
+		var f = new Wiz.File(null);
+		f.set_contents("");
+		cb.file = f;
 		var commit = cb.commit();
 		var de = new DirectoryEntry();
 		de.path = path;
@@ -100,7 +104,9 @@ public class DirectoryEntry {
 		var cb = bit.get_commit_builder();
 		if (bit.primary_tip != null)
 			cb.add_parent(bit.primary_tip);
-		cb.blob = builder.str;
+		var f = new Wiz.File(null);
+		f.set_contents(builder.str);
+		cb.file = f;
 		cb.commit();
 	}
 
@@ -114,7 +120,9 @@ public class DirectoryEntry {
 		var cb = bit.get_commit_builder();
 		if (bit.primary_tip != null)
 			cb.add_parent(bit.primary_tip);
-		cb.blob = builder.str;
+		var f = new Wiz.File(null);
+		f.set_contents(builder.str);
+		cb.file = f;
 		cb.commit();
 	}
 
@@ -163,7 +171,9 @@ public class DirectoryEntry {
 	public static void init() {
 		if (!store.has_bit("ROOT")) {
 			var cb = store.open_bit("ROOT").get_commit_builder();
-			cb.blob = "";
+			var f = new Wiz.File(null);
+			f.set_contents("");
+			cb.file = f;
 			cb.commit();
 		}
 	}
