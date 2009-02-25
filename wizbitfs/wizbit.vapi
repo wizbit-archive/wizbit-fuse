@@ -2,89 +2,99 @@
 
 [CCode (cprefix = "Wiz", lower_case_cprefix = "wiz_")]
 namespace Wiz {
+	[CCode (cprefix = "WizPrivate", lower_case_cprefix = "wiz_private_")]
+	namespace Private {
+		[CCode (cheader_filename = "wizbit/commit_store.h")]
+		public class CommitStore : GLib.Object {
+			public string? get_backward (string version_uuid);
+			public GLib.List<string> get_backwards (string version_uuid);
+			public int get_commits_between_timestamps (int timestamp1, int timestamp2);
+			public string? get_forward (string version_uuid);
+			public GLib.List<string> get_forwards (string version_uuid);
+			public string? get_primary_tip ();
+			public string? get_root ();
+			public int get_timestamp (string version_uuid);
+			public GLib.List<string> get_tips ();
+			public bool has_commit (string uuid);
+			public CommitStore (string database, string uuid);
+			public string database { get; construct; }
+			public string uuid { get; construct; }
+		}
+	}
 	[CCode (cheader_filename = "wizbit/bit.h")]
 	public class Bit : GLib.Object {
-		protected Wiz.BlobStore blobs;
-		public Wiz.CommitStore commits;
+		public Wiz.Private.CommitStore commits;
 		public Wiz.CommitBuilder get_commit_builder ();
 		public bool has_version (string uuid);
 		public Bit (string uuid, string? store_path);
-		public Wiz.Version open_version (string uuid);
-		public Wiz.Version? primary_tip { owned get; }
-		public Wiz.Version? root { owned get; }
+		public Wiz.Commit open_commit (string uuid);
+		public Wiz.Commit? primary_tip { owned get; }
+		public Wiz.Commit? root { owned get; }
 		public string store_path { get; construct; }
-		public GLib.List<Wiz.Version> tips { owned get; }
+		public GLib.List<Wiz.Commit> tips { owned get; }
 		public string uuid { get; construct; }
-	}
-	[CCode (cheader_filename = "wizbit/blob_store.h")]
-	public class Blob : GLib.Object {
-		public Blob.from_uuid (Wiz.BlobStore store, string uuid);
-		public Blob (Wiz.BlobStore store);
-		public GLib.MappedFile read () throws GLib.FileError;
-		public void serialize (out void* bufptr, out long size);
-		public void set_contents (void* bufptr, long size);
-		public void set_contents_from_file (string path) throws GLib.FileError;
-		public void write () throws GLib.FileError;
-		public bool parsed { get; set; }
-		public Wiz.BlobStore store { get; construct; }
-		public string uuid { get; set; }
-	}
-	[CCode (cheader_filename = "wizbit/blob_store.h")]
-	public class BlobStore : GLib.Object {
-		public bool exists (string uuid);
-		public BlobStore (string directory);
-		public GLib.MappedFile read (string uuid) throws GLib.FileError;
-		public string write (Wiz.Blob obj) throws GLib.FileError;
-		public string directory { get; construct; }
 	}
 	[CCode (cheader_filename = "wizbit/breadthfirst.h")]
 	public class BreadthFirstIterator : GLib.Object {
-		public void add_version (Wiz.Version v);
-		public void add_visited (Wiz.Version v);
-		public Wiz.Version get ();
-		public GLib.List<Wiz.Version> get_multiple (uint size);
-		public void kick_out (Wiz.Version v);
+		public void add_version (Wiz.Commit v);
+		public void add_visited (Wiz.Commit v);
+		public Wiz.Commit get ();
+		public GLib.List<Wiz.Commit> get_multiple (uint size);
+		public void kick_out (Wiz.Commit v);
 		public BreadthFirstIterator ();
 		public bool next ();
-		public bool end { get; set; }
 	}
-	[CCode (ref_function = "wiz_commit_ref", unref_function = "wiz_commit_unref", param_spec_function = "wiz_param_spec_commit", cheader_filename = "wizbit/commit.h")]
-	public class Commit {
-		public GLib.List<string> parents;
-		public void Commit ();
-		public Commit ();
-		public string blob { get; set; }
-		public string committer { get; set; }
-		public int timestamp { get; set; }
-		public int timestamp2 { get; set; }
-		public string uuid { get; set; }
+	[CCode (cheader_filename = "wizbit/commit.h")]
+	public class Commit : GLib.Object {
+		public Wiz.CommitBuilder get_commit_builder ();
+		public Commit (Wiz.Bit bit, string version_uuid);
+		public Wiz.Bit bit { get; construct; }
+		public GLib.List<Wiz.Commit> children { owned get; }
+		public string committer { get; }
+		public Wiz.File file { owned get; }
+		public Wiz.Commit? next { owned get; }
+		public GLib.List<Wiz.Commit> parents { owned get; }
+		public Wiz.Commit? previous { owned get; }
+		public int timestamp { get; }
+		public string version_uuid { get; construct; }
 	}
 	[CCode (ref_function = "wiz_commit_builder_ref", unref_function = "wiz_commit_builder_unref", param_spec_function = "wiz_param_spec_commit_builder", cheader_filename = "wizbit/commit_builder.h")]
 	public class CommitBuilder {
-		public void add_parent (Wiz.Version parent);
-		public Wiz.Version commit ();
+		public void add_parent (Wiz.Commit parent);
+		public Wiz.Commit commit ();
 		public CommitBuilder (Wiz.Bit bit);
-		public string blob { set; }
 		public string committer { set; }
+		public Wiz.File file { get; set; }
 		public int timestamp { set; }
 	}
-	[CCode (cheader_filename = "wizbit/commit_store.h")]
-	public class CommitStore : GLib.Object {
-		public string? get_backward (string version_uuid);
-		public GLib.List<string> get_backwards (string version_uuid);
-		public int get_commits_between_timestamps (int timestamp1, int timestamp2);
-		public string? get_forward (string version_uuid);
-		public GLib.List<string> get_forwards (string version_uuid);
-		public string? get_primary_tip ();
-		public string? get_root ();
-		public int get_timestamp (string version_uuid);
-		public GLib.List<string> get_tips ();
-		public bool has_commit (string uuid);
-		public Wiz.Commit? lookup_commit (string uuid);
-		public CommitStore (string database, string uuid);
-		public Wiz.Commit store_commit (Wiz.Commit c);
-		public string database { get; construct; }
-		public string uuid { get; construct; }
+	[CCode (cheader_filename = "wizbit/iterator.h")]
+	public class CommitIterator : GLib.Object {
+		[CCode (cheader_filename = "wizbit/iterator.h")]
+		public static delegate void Gatherer (Wiz.CommitIterator iter, Wiz.Commit v);
+		public static void BreadthFirstGatherer (Wiz.CommitIterator iter, Wiz.Commit v);
+		public static void DepthFirstGatherer (Wiz.CommitIterator iter, Wiz.Commit v);
+		public static void MainlineGatherer (Wiz.CommitIterator iter, Wiz.Commit v);
+		public static void NoHuntGatherer (Wiz.CommitIterator iter, Wiz.Commit v);
+		public void append_queue (Wiz.Commit version);
+		public void append_visited (Wiz.Commit version);
+		public Wiz.Commit get ();
+		public bool have_visited (Wiz.Commit version);
+		public CommitIterator (Wiz.CommitIterator.Gatherer gather);
+		public bool next ();
+		public void prepend_queue (Wiz.Commit version);
+	}
+	[CCode (cheader_filename = "wizbit/file.h")]
+	public class File : GLib.Object {
+		public GLib.OutputStream append_to ();
+		public string get_contents () throws GLib.FileError;
+		public GLib.MappedFile get_mapped_file ();
+		public string get_path ();
+		public string hash ();
+		public File (string? parent_hash);
+		public GLib.InputStream read ();
+		public GLib.OutputStream replace ();
+		public void set_contents (string contents, long length = -1) throws GLib.FileError;
+		public string stream_name { get; set; }
 	}
 	[CCode (cheader_filename = "wizbit/store.h")]
 	public class Store : GLib.Object {
@@ -95,23 +105,6 @@ namespace Wiz {
 		public Wiz.Bit open_bit (string uuid);
 		public string directory { get; construct; }
 		public string uuid { get; construct; }
-	}
-	[CCode (cheader_filename = "wizbit/version.h")]
-	public class Version : GLib.Object {
-		public Wiz.CommitBuilder get_commit_builder ();
-		public long get_length () throws GLib.FileError;
-		public Version (Wiz.Bit bit, string version_uuid);
-		public GLib.InputStream read () throws GLib.FileError;
-		public char* read_as_string () throws GLib.FileError;
-		public Wiz.Bit bit { get; construct; }
-		protected string blob_id { get; }
-		public GLib.List<Wiz.Version> children { owned get; }
-		public string committer { get; }
-		public Wiz.Version? next { owned get; }
-		public GLib.List<Wiz.Version> parents { owned get; }
-		public Wiz.Version? previous { owned get; }
-		public int timestamp { get; }
-		public string version_uuid { get; construct; }
 	}
 }
 [CCode (cheader_filename = "wizbit/sync.h")]
@@ -130,5 +123,3 @@ public class SyncClient : GLib.Object {
 	public void pull (SyncSource server) throws GLib.FileError;
 	public Wiz.Store store { get; construct; }
 }
-[CCode (cheader_filename = "wizbit/utils.h")]
-public static string generate_uuid ();
