@@ -82,7 +82,7 @@ public class DirectoryEntry {
 	public void mkdir(string path, mode_t mode) {
 		var bit = store.create_bit();
 		var cb = bit.get_commit_builder();
-		var f = new Wiz.File(null);
+		var f = new Wiz.File();
 		f.set_contents("");
 		cb.file = f;
 		var commit = cb.commit();
@@ -104,7 +104,7 @@ public class DirectoryEntry {
 		var cb = bit.get_commit_builder();
 		if (bit.primary_tip != null)
 			cb.add_parent(bit.primary_tip);
-		var f = new Wiz.File(null);
+		var f = new Wiz.File();
 		f.set_contents(builder.str);
 		cb.file = f;
 		cb.commit();
@@ -120,7 +120,7 @@ public class DirectoryEntry {
 		var cb = bit.get_commit_builder();
 		if (bit.primary_tip != null)
 			cb.add_parent(bit.primary_tip);
-		var f = new Wiz.File(null);
+		var f = new Wiz.File();
 		f.set_contents(builder.str);
 		cb.file = f;
 		cb.commit();
@@ -171,7 +171,7 @@ public class DirectoryEntry {
 	public static void init() {
 		if (!store.has_bit("ROOT")) {
 			var cb = store.open_bit("ROOT").get_commit_builder();
-			var f = new Wiz.File(null);
+			var f = new Wiz.File();
 			f.set_contents("");
 			cb.file = f;
 			cb.commit();

@@ -57,7 +57,7 @@ int wizfs_mknod(string path, mode_t mode, dev_t rdev)
 
 	// Always start from an empty string
 	var cb = bit.get_commit_builder();
-	var f = new Wiz.File(null);
+	var f = new Wiz.File();
 	f.set_contents("");
 	cb.file = f;
 	var v = cb.commit();

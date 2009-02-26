@@ -71,16 +71,16 @@ namespace Wiz {
 	public class CommitIterator : GLib.Object {
 		[CCode (cheader_filename = "wizbit/iterator.h")]
 		public static delegate void Gatherer (Wiz.CommitIterator iter, Wiz.Commit v);
-		public static void BreadthFirstGatherer (Wiz.CommitIterator iter, Wiz.Commit v);
-		public static void DepthFirstGatherer (Wiz.CommitIterator iter, Wiz.Commit v);
-		public static void MainlineGatherer (Wiz.CommitIterator iter, Wiz.Commit v);
-		public static void NoHuntGatherer (Wiz.CommitIterator iter, Wiz.Commit v);
 		public void append_queue (Wiz.Commit version);
 		public void append_visited (Wiz.Commit version);
+		public static void breadth_first (Wiz.CommitIterator iter, Wiz.Commit v);
+		public static void depth_first (Wiz.CommitIterator iter, Wiz.Commit v);
 		public Wiz.Commit get ();
 		public bool have_visited (Wiz.Commit version);
+		public static void mainline (Wiz.CommitIterator iter, Wiz.Commit v);
 		public CommitIterator (Wiz.CommitIterator.Gatherer gather);
 		public bool next ();
+		public static void no_hunt (Wiz.CommitIterator iter, Wiz.Commit v);
 		public void prepend_queue (Wiz.Commit version);
 	}
 	[CCode (cheader_filename = "wizbit/file.h")]
@@ -90,7 +90,7 @@ namespace Wiz {
 		public GLib.MappedFile get_mapped_file ();
 		public string get_path ();
 		public string hash ();
-		public File (string? parent_hash);
+		public File ();
 		public GLib.InputStream read ();
 		public GLib.OutputStream replace ();
 		public void set_contents (string contents, long length = -1) throws GLib.FileError;
