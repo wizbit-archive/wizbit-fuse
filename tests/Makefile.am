@@ -8,7 +8,6 @@ common_sources = \
 	$(top_srcdir)/wizbitfs/posix.vapi \
 	$(top_srcdir)/wizbitfs/fuse.vapi \
 	$(top_srcdir)/wizbitfs/wizbit.vapi \
-	tests.vapi \
 	$(NULL)
 
 test_directory_VALASOURCES = \
