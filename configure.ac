@@ -10,7 +10,7 @@ AC_PATH_PROG(VALAC, valac, valac)
 
 GLIB_REQUIRED=2.12.0
 
-PKG_CHECK_MODULES(WIZBIT, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED gio-2.0 gio-unix-2.0 fuse wizbit)
+PKG_CHECK_MODULES(WIZBIT, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED gio-2.0 gio-unix-2.0 gee-1.0 fuse wizbit)
 AC_SUBST(WIZBIT_CFLAGS)
 AC_SUBST(WIZBIT_LIBS)
 

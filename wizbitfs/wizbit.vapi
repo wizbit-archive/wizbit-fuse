@@ -17,6 +17,7 @@ namespace Wiz {
 			public GLib.List<string> get_tips ();
 			public bool has_commit (string uuid);
 			public CommitStore (string database, string uuid);
+			public void store_blob (string uuid, string stream_name, string hash);
 			public string database { get; construct; }
 			public string uuid { get; construct; }
 		}
@@ -51,20 +52,21 @@ namespace Wiz {
 		public Wiz.Bit bit { get; construct; }
 		public GLib.List<Wiz.Commit> children { owned get; }
 		public string committer { get; }
-		public Wiz.File file { owned get; }
 		public Wiz.Commit? next { owned get; }
 		public GLib.List<Wiz.Commit> parents { owned get; }
 		public Wiz.Commit? previous { owned get; }
+		public Gee.ReadOnlyMap<string,Wiz.File> streams { owned get; }
 		public int timestamp { get; }
 		public string version_uuid { get; construct; }
 	}
 	[CCode (ref_function = "wiz_commit_builder_ref", unref_function = "wiz_commit_builder_unref", param_spec_function = "wiz_param_spec_commit_builder", cheader_filename = "wizbit/commit_builder.h")]
 	public class CommitBuilder {
+		public Gee.HashMap<string,Wiz.File> streams;
 		public void add_parent (Wiz.Commit parent);
+		public void add_stream (string name, Wiz.File stream);
 		public Wiz.Commit commit ();
 		public CommitBuilder (Wiz.Bit bit);
 		public string committer { set; }
-		public Wiz.File file { get; set; }
 		public int timestamp { set; }
 	}
 	[CCode (cheader_filename = "wizbit/iterator.h")]

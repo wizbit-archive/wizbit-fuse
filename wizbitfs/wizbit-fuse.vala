@@ -22,7 +22,7 @@ int wizfs_getattr(string path, stat *stbuf)
 		return -ENOENT;
 
 	var commit = store.open_bit(dirent.uuid).primary_tip;
-	var mf = commit.file.get_mapped_file();
+	var mf = commit.streams.get("data").get_mapped_file();
 
 	stbuf->st_mode = dirent.mode;
 
@@ -59,7 +59,7 @@ int wizfs_mknod(string path, mode_t mode, dev_t rdev)
 	var cb = bit.get_commit_builder();
 	var f = new Wiz.File();
 	f.set_contents("");
-	cb.file = f;
+	cb.streams.set("data", f);
 	var v = cb.commit();
 
 	var parent = DirectoryEntry.find_containing(path);
@@ -133,7 +133,7 @@ int wizfs_read(string path, char *buf, size_t size, off_t offset, ref Fuse.FileI
 	if (commit == null)
 		return -ENOENT;
 
-	var mf = commit.file.get_mapped_file();
+	var mf = commit.streams.get("data").get_mapped_file();
 	char *blob = mf.get_contents();
 	long len = mf.get_length();
 
@@ -170,9 +170,9 @@ int wizfs_release(string path, ref Fuse.FileInfo fi)
 
 	if (new_blobs[fi.fh] != null) {
 		var cb = commit.get_commit_builder();
-		var f = commit.file;
+		var f = commit.streams.get("data");
 		f.set_contents(new_blobs[fi.fh].str);
-		cb.file = f;
+		cb.streams.set("data", f);
 		cb.commit();
 	}
 
