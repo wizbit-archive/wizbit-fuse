@@ -105,6 +105,7 @@ public class DirectoryEntry {
 		if (bit.primary_tip != null)
 			cb.add_parent(bit.primary_tip);
 		var f = new Wiz.File();
+		f.set_contents(builder.str);
 		cb.streams.set("data", f);
 		cb.commit();
 	}
