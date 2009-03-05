@@ -28,6 +28,8 @@ int wizfs_getattr(string path, stat *stbuf)
 
 	if (S_ISDIR(dirent.mode)) {
 		stbuf->st_nlink = 2;
+		foreach (var child in dirent)
+			stbuf->st_nlink++;
 	} else if (S_ISREG(dirent.mode)) {
 		stbuf->st_nlink = 1;
 		stbuf->st_size = mf.get_length();
