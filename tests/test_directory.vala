@@ -114,14 +114,14 @@ static int main(string [] args)
 	var me = new WizbitFuseTest();
 	var ts = new TestSuite("directory");
 	ts.add(new TestCase("test_iter_empty_root", 0, me.setup, me.test_iter_empty_root, me.teardown));
-	ts.add(new TestCase("test_iter_root", 0, me.setup, me.test_iter_empty_root, me.teardown));
+	ts.add(new TestCase("test_iter_root", 0, me.setup, me.test_iter_root, me.teardown));
 	ts.add(new TestCase("test_iter_root_with_dir", 0, me.setup, me.test_iter_root_with_dir, me.teardown));
 	ts.add(new TestCase("test_add_child", 0, me.setup, me.test_add_child, me.teardown));
-	ts.add(new TestCase("test_find", 0, me.setup, me.test_add_child, me.teardown));
+	ts.add(new TestCase("test_find", 0, me.setup, me.test_find, me.teardown));
 	ts.add(new TestCase("test_find_missing_node", 0, me.setup, me.test_find_missing_node, me.teardown));
 	ts.add(new TestCase("test_find_multiple_missing_node", 0, me.setup, me.test_find_multiple_missing_node, me.teardown));
 	ts.add(new TestCase("test_iter_missing", 0, me.setup, me.test_iter_missing, me.teardown));
-	ts.add(new TestCase("test_iter_child", 0, me.setup, me.test_iter_missing, me.teardown));
+	ts.add(new TestCase("test_iter_child", 0, me.setup, me.test_iter_child, me.teardown));
 	ts.add(new TestCase("test_remove_dirent", 0, me.setup, me.test_remove_dirent, me.teardown));
 	ts.add(new TestCase("test_remove_dirent_child", 0, me.setup, me.test_remove_dirent_child, me.teardown));
 	TestSuite.get_root().add_suite(ts);
