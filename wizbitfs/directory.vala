@@ -145,7 +145,7 @@ public class DirectoryEntry {
 		de.uuid = "ROOT";
 		var commit = store.open_bit("ROOT").primary_tip;
 		de.version = commit.version_uuid;
-		de.mode = S_IFDIR | 0666;
+		de.mode = S_IFDIR | 0755;
 		return de;
 	}
 
