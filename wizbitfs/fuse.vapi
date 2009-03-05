@@ -48,6 +48,7 @@ namespace Fuse {
 	public static delegate int Chown(string path, uid_t uid, gid_t gid);
 	public static delegate int Truncate(string path, off_t size);
 	public static delegate int Utimens(string path, timespec[2] ts);
+	public static delegate int Create(string path, mode_t mode, ref FileInfo fi);
 	public static delegate int Open(string path, ref FileInfo fi);
 	public static delegate int Read(string path, char *buf, size_t size, off_t offset, ref FileInfo fi);
 	public static delegate int Write(string path, char *buf, size_t size, off_t offset, ref FileInfo fi);
@@ -77,6 +78,7 @@ namespace Fuse {
 		public Chown chown;
 		public Truncate truncate;
 		public Utimens utimens;
+		public Create create;
 		public Open open;
 		public Read read;
 		public Write write;

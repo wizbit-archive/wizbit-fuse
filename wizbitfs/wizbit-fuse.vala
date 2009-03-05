@@ -77,6 +77,14 @@ int wizfs_mknod(string path, mode_t mode, dev_t rdev)
 	return 0;
 }
 
+int wizfs_create(string path, mode_t mode, ref Fuse.FileInfo fi) {
+	dev_t rdev = 0;
+	var ret = wizfs_mknod(path, mode, rdev);
+	if (ret != 0)
+		return ret;
+	return wizfs_open(path, ref fi);
+}
+
 int wizfs_unlink(string path)
 {
 	DirectoryEntry.find_containing(path).rm(Path.get_basename(path));
@@ -196,6 +204,7 @@ static int main(string [] args)
 	opers.rmdir = wizfs_rmdir;
 	opers.getattr = wizfs_getattr;
 	opers.mknod = wizfs_mknod;
+	opers.create = wizfs_create;
 	opers.utimens = wizfs_utimens;
 	opers.open = wizfs_open;
 	opers.read = wizfs_read;
