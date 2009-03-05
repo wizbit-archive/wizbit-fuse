@@ -7,7 +7,6 @@ common_sources = \
 	$(top_srcdir)/wizbitfs/directory.vala \
 	$(top_srcdir)/wizbitfs/posix.vapi \
 	$(top_srcdir)/wizbitfs/fuse.vapi \
-	$(top_srcdir)/wizbitfs/wizbit.vapi \
 	$(NULL)
 
 test_directory_VALASOURCES = \
@@ -21,7 +20,7 @@ test_directory_SOURCES = \
 	$(NULL)
 
 test_directory.vala.stamp: $(test_directory_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --pkg gee-1.0 --pkg gio-2.0 $^
+	$(VALAC) -C --basedir $(top_srcdir) --pkg gee-1.0 --pkg gio-2.0 --pkg wizbit $^
 	touch $@
 
 test_directory_CFLAGS=@WIZBIT_CFLAGS@ -I$(top_srcdir) -D_FILE_OFFSET_BITS=64 -DFUSE_USE_VERSION=26
