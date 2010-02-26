@@ -60,21 +60,25 @@ int wizfs_mknod(string path, mode_t mode, dev_t rdev)
 	// Always start from an empty string
 	var cb = bit.get_commit_builder();
 	var f = new Wiz.File();
-	f.set_contents("");
-	cb.streams.set("data", f);
-	var v = cb.commit();
+	try {
+		f.set_contents("");
+		cb.streams.set("data", f);
+		var v = cb.commit();
 
-	var parent = DirectoryEntry.find_containing(path);
+		var parent = DirectoryEntry.find_containing(path);
 
-	var de = new DirectoryEntry();
-	de.path = Path.get_basename(path);
-	de.uuid = bit.uuid;
-	de.version = v.version_uuid;
-	de.mode = mode;
-	
-	parent.add_child(de);
+		var de = new DirectoryEntry();
+		de.path = Path.get_basename(path);
+		de.uuid = bit.uuid;
+		de.version = v.version_uuid;
+		de.mode = mode;
+		
+		parent.add_child(de);
+		return 0;
+	} catch (GLib.FileError e) {
+		error ("error setting blob contents: %s", e.message);
+	}
 
-	return 0;
 }
 
 int wizfs_create(string path, mode_t mode, ref Fuse.FileInfo fi) {
