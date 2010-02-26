@@ -3,8 +3,8 @@ using Posix;
 using Wiz;
 
 static Wiz.Store store;
-static Wiz.Commit[255] versions;
-static StringBuilder[255] new_blobs;
+static Wiz.Commit[] versions;
+static StringBuilder[] new_blobs;
 
 Wiz.Commit? get_version_from_fh(uint64 fh)
 {
@@ -13,9 +13,9 @@ Wiz.Commit? get_version_from_fh(uint64 fh)
 	return versions[fh];
 }
 
-int wizfs_getattr(string path, stat *stbuf)
+int wizfs_getattr(string path, Posix.Stat *stbuf)
 {
-	Memory.set((void *)stbuf, 0, sizeof(stat));
+	Memory.set((void *)stbuf, 0, sizeof(Posix.Stat));
 
 	var dirent = DirectoryEntry.find(path);
 	if (dirent == null)
@@ -91,7 +91,7 @@ int wizfs_unlink(string path)
 	return 0;
 }
 
-int wizfs_utimens(string path, timespec[2] ts)
+int wizfs_utimens(string path, timespec[] ts)
 {
 	// Pretend this worked when really we don't try to
 	// implement it (create/mod times come from DAG)
@@ -181,9 +181,13 @@ int wizfs_release(string path, ref Fuse.FileInfo fi)
 	if (new_blobs[fi.fh] != null) {
 		var cb = commit.get_commit_builder();
 		var f = commit.streams.get("data");
-		f.set_contents(new_blobs[fi.fh].str);
-		cb.streams.set("data", f);
-		cb.commit();
+		try {
+			f.set_contents(new_blobs[fi.fh].str);
+			cb.streams.set("data", f);
+			cb.commit();
+		} catch (GLib.FileError e) {
+			error ("error setting blob contents: %s", e.message);
+		}
 	}
 
 	versions[fi.fh] = null;

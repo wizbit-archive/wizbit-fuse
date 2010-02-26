@@ -83,15 +83,20 @@ public class DirectoryEntry {
 		var bit = store.create_bit();
 		var cb = bit.get_commit_builder();
 		var f = new Wiz.File();
-		f.set_contents("");
-		cb.streams.set("data", f);
-		var commit = cb.commit();
-		var de = new DirectoryEntry();
-		de.path = path;
-		de.uuid = bit.uuid;
-		de.version = commit.version_uuid;
-		de.mode = mode;
-		this.add_child(de);
+		try {
+			f.set_contents("");
+			cb.streams.set("data", f);
+			var commit = cb.commit();
+			var de = new DirectoryEntry();
+			de.path = path;
+			de.uuid = bit.uuid;
+			de.version = commit.version_uuid;
+			de.mode = mode;
+			this.add_child(de);
+		} catch (FileError e) {
+			//FIXME
+			error ("error creating file %s", e.message);
+		}
 	}
 
 	public void rm(string path) {
@@ -105,9 +110,13 @@ public class DirectoryEntry {
 		if (bit.primary_tip != null)
 			cb.add_parent(bit.primary_tip);
 		var f = new Wiz.File();
-		f.set_contents(builder.str);
-		cb.streams.set("data", f);
-		cb.commit();
+		try {
+			f.set_contents(builder.str);
+			cb.streams.set("data", f);
+			cb.commit();
+		} catch (GLib.FileError e) {
+			error ("error saving data: %s", e.message);
+		}
 	}
 
 	public void add_child(DirectoryEntry de) {
@@ -121,9 +130,13 @@ public class DirectoryEntry {
 		if (bit.primary_tip != null)
 			cb.add_parent(bit.primary_tip);
 		var f = new Wiz.File();
-		f.set_contents(builder.str);
-		cb.streams.set("data", f);
-		cb.commit();
+		try {
+			f.set_contents(builder.str);
+			cb.streams.set("data", f);
+			cb.commit();
+		} catch (GLib.FileError e) {
+			error ("error creating file %s", e.message);
+		}
 	}
 
 	public string as_string() {
@@ -172,9 +185,14 @@ public class DirectoryEntry {
 		if (!store.has_bit("ROOT")) {
 			var cb = store.open_bit("ROOT").get_commit_builder();
 			var f = new Wiz.File();
-			f.set_contents("");
-			cb.streams.set("data", f);
-			cb.commit();
+			try {
+				f.set_contents("");
+				cb.streams.set("data", f);
+				cb.commit();
+			} catch (GLib.FileError e) {
+				error ("error creating file %s", e.message);
+			}
+				
 		}
 	}
 }
