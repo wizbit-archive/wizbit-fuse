@@ -78,7 +78,7 @@ int wizfs_mknod(string path, mode_t mode, dev_t rdev)
 	} catch (GLib.FileError e) {
 		error ("error setting blob contents: %s", e.message);
 	}
-
+	return EIO;
 }
 
 int wizfs_create(string path, mode_t mode, ref Fuse.FileInfo fi) {

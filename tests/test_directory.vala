@@ -18,7 +18,7 @@ class WizbitFuseTest {
 	public void setup(void *fixture) {
 		this.olddir = Environment.get_current_dir();
 		this.directory = DirUtils.mkdtemp(Path.build_filename(Environment.get_tmp_dir(), "XXXXXX"));
-		stdout.printf("%s\n", this.directory);
+		GLib.stdout.printf("%s\n", this.directory);
 		Environment.set_current_dir(this.directory);
 
 		store = new Wiz.Store("", ".");
