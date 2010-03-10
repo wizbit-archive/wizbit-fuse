@@ -5,6 +5,7 @@ BUILT_SOURCES = wizbit-fuse.vala.stamp
 
 wizbit_fuse_VALASOURCES = \
 	fuse.vapi \
+	posix.vapi \
 	directory.vala \
 	wizbit-fuse.vala \
 	$(NULL)
@@ -14,7 +15,7 @@ wizbit_fuse_SOURCES = \
 	$(NULL)
 
 wizbit-fuse.vala.stamp: $(wizbit_fuse_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --pkg gee-1.0 --pkg gio-2.0 --pkg posix --pkg wizbit $^
+	$(VALAC) -C --basedir $(top_srcdir) --pkg gee-1.0 --pkg gio-2.0 --pkg wizbit $^
 	touch $@
 
 wizbit_fuse_CFLAGS=@WIZBIT_CFLAGS@ -I$(top_srcdir) -D_FILE_OFFSET_BITS=64 -DFUSE_USE_VERSION=26

@@ -20,6 +20,8 @@
  * 	John Carr <john.carr@unrouted.co.uk>
  */
 
+using Posix;
+
 [CCode (cprefix = "fuse_", cheader_filename = "fuse/fuse.h")]
 namespace Fuse {
 	[CCode (cname = "struct fuse_file_info")]
